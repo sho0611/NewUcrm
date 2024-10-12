@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Item;
 use App\Models\Customer;
 
+
 class PurchaseController extends Controller
 {
     /**
@@ -80,8 +81,21 @@ class PurchaseController extends Controller
      */
     public function show(Purchase $purchase)
     {
-        //
+        $orders = Purchase::query()
+            ->leftJoin('item_purchase', 'purchases.id', '=', 'item_purchase.purchase_id')
+            ->leftJoin('items', 'item_purchase.item_id', '=', 'items.id')
+            ->leftJoin('customers', 'purchases.customer_id', '=', 'customers.id')
+            ->where('purchases.id', $purchase->id) 
+            ->groupBy('purchases.id')
+            ->selectRaw('purchases.id as id, SUM(items.price * item_purchase.quantity) as total, customers.name as customer_name, customers.kana as customer_kana, purchases.status, purchases.created_at')
+            ->first(); // 1件の結果を取得
+
+    
+        return response()->json($orders);
     }
+    
+    
+    
 
     /**
      * Show the form for editing the specified resource.
@@ -91,7 +105,16 @@ class PurchaseController extends Controller
      */
     public function edit(Purchase $purchase)
     {
-        //
+        $orders = Purchase::query()
+            ->leftJoin('item_purchase', 'purchases.id', '=', 'item_purchase.purchase_id')
+            ->leftJoin('items', 'item_purchase.item_id', '=', 'items.id')
+            ->leftJoin('customers', 'purchases.customer_id', '=', 'customers.id')
+            ->where('purchases.id', $purchase->id) 
+            ->groupBy('purchases.id')
+            ->selectRaw('purchases.id as id, SUM(items.price * item_purchase.quantity) as total, customers.name as customer_name, customers.kana as customer_kana, purchases.status, purchases.created_at')
+            ->first(); // 1件の結果を取得
+    
+        return response()->json($orders);
     }
 
     /**
@@ -101,9 +124,21 @@ class PurchaseController extends Controller
      * @param  \App\Models\Purchase  $purchase
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdatePurchaseRequest $request, Purchase $purchase)
+    public function update(int $requestId, Request $request)
     {
-        //
+        $purchase = Purchase::query()->findOrFail($requestId);
+
+        $purchaseUpdateArray = [
+            'customer_id' => $request->customer_id,
+            'status' => $request->status
+        ];
+
+        $purchase->fill($purchaseUpdateArray)->save();
+
+        $purchase->items()->sync($request->items);
+
+        return response()->json($purchase);
+         
     }
 
     /**
@@ -114,6 +149,7 @@ class PurchaseController extends Controller
      */
     public function destroy(Purchase $purchase)
     {
-        //
+        $purchase->delete();
+        return response()->json($purchase);
     }
 }

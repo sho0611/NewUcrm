@@ -6,6 +6,10 @@ use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use App\Models\Item;
 use Illuminate\Http\Request;
+use App\Rules\ItemsRule;
+use Illuminate\Support\Facades\Log;
+
+
 
 class ItemController extends Controller
 {
@@ -16,12 +20,46 @@ class ItemController extends Controller
      */
     public function index(Request $request)
     {
-        $items = Item::query()
-        ->select('*')
-        ->get();
-        return response()->json($items); 
-    }
+        // $items = Item::itemCustomers()->take(10)->get();
+  
+    $orders = Item::query()
+    ->leftJoin('item_purchase', 'items.id', '=', 'item_purchase.item_id')
+    ->leftJoin('purchases', 'item_purchase.purchase_id', '=', 'purchases.id')
+    ->leftJoin('customers', 'purchases.customer_id', '=', 'customers.id')
+    ->selectRaw('
+        items.id AS item_id,
+        items.name AS item_name,
+        items.price AS item_price,
+        item_purchase.id AS pivot_id,
+        item_purchase.item_id AS item_purchase_id,
+        item_purchase.quantity AS item_quantity,
+        purchases.id AS purchase_id,
+        purchases.customer_id AS purchase_customer_id,
+        customers.id AS customer_id,
+        customers.name AS customer_name,
+        customers.kana AS customer_kana,
+        customers.tel AS customer_tel
+    ')->take(10)->get();
 
+$itemOrders = $orders->groupBy('item_id')->map(function ($group) {
+    $firstItem = $group->first();
+
+    return [
+        'item_id' => $firstItem->item_id,
+        'name' => $firstItem->item_name, 
+        'customers' => $group->map(function ($customer) {
+            return [
+                'customer_id' => $customer->customer_id,
+                'customer_name' => $customer->customer_name,
+                'customer_kana' => $customer->customer_kana, 
+                'customer_tel' => $customer->customer_tel,
+            ];
+        }),
+    ];
+})->values();
+return response()->json($itemOrders);
+    }
+    
     /**
      * Show the form for creating a new resource.
      *
@@ -29,6 +67,14 @@ class ItemController extends Controller
      */
     public function create(Request $request) 
     {
+
+        $request->validate([
+            'name' => [new ItemsRule(true)], 
+            'memo' => [new ItemsRule(true)],  
+            'price' => [new ItemsRule(true)],  
+            'is_selling' => [new ItemsRule(true)],
+        ]);
+    
         $item = new Item();
 
         $itemCreateArray = [
@@ -44,12 +90,7 @@ class ItemController extends Controller
     
       
         return response()->json($item);
-       
-
     }
-
-    
-
     /**
      * Store a newly created resource in storage.
      *
@@ -59,7 +100,6 @@ class ItemController extends Controller
 
 public function store(Request $request)
 {
-   
     $item = new Item();
 
     $itemCreateArray = [

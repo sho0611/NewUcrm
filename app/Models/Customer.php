@@ -17,16 +17,30 @@ class Customer extends Model
         return $this->hasMany(Purchase::class);
     }
 
-    public function scopeSearchCustomers($query, $input = null)
+
+    public function scopeCustomerItems($query)
     {
-        if(!empty($input)){
-          
-         if(Customer::where('kana', 'like', $input . '%' )
-           ->orWhere('tel', 'like', $input . '%')->exists())
-     {
-        return $query->where('kana', 'like', $input . '%' )
-        ->orWhere('tel', 'like', $input . '%');
-      }
+        return $query->select(
+                'customers.id AS customer_id',
+                'customers.name AS customer_name',
+                'customers.kana AS customer_kana',
+                'customers.tel AS customer_tel',
+                'purchases.id AS purchase_id',
+                'purchases.customer_id',
+                'item_purchase.purchase_id AS item_purchase_id',
+                'item_purchase.item_id',
+                'item_purchase.quantity',
+                'items.id AS item_id',
+                'items.name AS item_name',
+                'items.price AS item_price',
+                'items.memo AS item_memo'
+            )
+            ->leftJoin('purchases', 'customers.id', '=', 'purchases.customer_id')
+            ->leftJoin('item_purchase', 'purchases.id', '=', 'item_purchase.purchase_id')
+            ->leftJoin('items', 'item_purchase.item_id', '=', 'items.id');
     }
-  }
 }
+
+
+    
+
