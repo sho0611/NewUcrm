@@ -12,52 +12,46 @@ use Illuminate\Support\Facades\Log;
 
 
 class ItemController extends Controller
-{
+{  /**
+    * Display a listing of the resource.
+    *
+    * @return \Illuminate\Http\Response
+    */
+   public function viewItems(Request $request)
+   {
+        $items = Item::query()
+        ->select('*')
+        ->get();
+
+            return response()->json($items);
+   }
+   
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function viewItemCustomers(Request $request)
     {
-        // $items = Item::itemCustomers()->take(10)->get();
+    $orders = Item::itemCustomers()->take(1000)->get();
   
-    $orders = Item::query()
-    ->leftJoin('item_purchase', 'items.id', '=', 'item_purchase.item_id')
-    ->leftJoin('purchases', 'item_purchase.purchase_id', '=', 'purchases.id')
-    ->leftJoin('customers', 'purchases.customer_id', '=', 'customers.id')
-    ->selectRaw('
-        items.id AS item_id,
-        items.name AS item_name,
-        items.price AS item_price,
-        item_purchase.id AS pivot_id,
-        item_purchase.item_id AS item_purchase_id,
-        item_purchase.quantity AS item_quantity,
-        purchases.id AS purchase_id,
-        purchases.customer_id AS purchase_customer_id,
-        customers.id AS customer_id,
-        customers.name AS customer_name,
-        customers.kana AS customer_kana,
-        customers.tel AS customer_tel
-    ')->take(10)->get();
-
-$itemOrders = $orders->groupBy('item_id')->map(function ($group) {
+    $itemOrders = $orders->groupBy('item_id')->map(function ($group) {
     $firstItem = $group->first();
 
-    return [
-        'item_id' => $firstItem->item_id,
-        'name' => $firstItem->item_name, 
-        'customers' => $group->map(function ($customer) {
             return [
-                'customer_id' => $customer->customer_id,
-                'customer_name' => $customer->customer_name,
-                'customer_kana' => $customer->customer_kana, 
-                'customer_tel' => $customer->customer_tel,
+                'item_id' => $firstItem->item_id,
+                'name' => $firstItem->item_name, 
+                'customers' => $group->map(function ($customer) {
+                    return [
+                        'customer_id' => $customer->customer_id,
+                        'customer_name' => $customer->customer_name,
+                        'customer_kana' => $customer->customer_kana, 
+                        'customer_tel' => $customer->customer_tel,
+                    ];
+                }),
             ];
-        }),
-    ];
-})->values();
-return response()->json($itemOrders);
+        })->values();
+        return response()->json($itemOrders);
     }
     
     /**
@@ -65,16 +59,8 @@ return response()->json($itemOrders);
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request) 
+    public function create(StoreItemRequest $request) 
     {
-
-        $request->validate([
-            'name' => [new ItemsRule(true)], 
-            'memo' => [new ItemsRule(true)],  
-            'price' => [new ItemsRule(true)],  
-            'is_selling' => [new ItemsRule(true)],
-        ]);
-    
         $item = new Item();
 
         $itemCreateArray = [
@@ -88,7 +74,6 @@ return response()->json($itemOrders);
         $item->fill($itemCreateArray);
         $item->save();
     
-      
         return response()->json($item);
     }
     /**
@@ -98,7 +83,7 @@ return response()->json($itemOrders);
      * @return \Illuminate\Http\Response
      */
 
-public function store(Request $request)
+public function store(StoreItemRequest $request)
 {
     $item = new Item();
 
@@ -147,7 +132,7 @@ public function store(Request $request)
      * @param  \App\Models\Item  $item
      * @return \Illuminate\Http\Response
      */
-    public function update(int $itemsId, Request $request)
+    public function update(int $itemsId, UpdateItemRequest $request)
     {
         $item = Item::query()->findOrFail($itemsId);
 

@@ -20,8 +20,6 @@ class PurchaseController extends Controller
     public function index(Request $request)
     {
         $query = Purchase::query();
-
-       
         $orders = $query->leftJoin('item_purchase', 'purchases.id', '=', 'item_purchase.purchase_id')
             ->leftJoin('items', 'item_purchase.item_id', '=', 'items.id')
             ->leftJoin('customers', 'purchases.customer_id', '=', 'customers.id')

@@ -22,7 +22,7 @@ class Item extends Model
     {
         return $query->select(
             'items.id AS item_id', 
-            'items.name', 
+            'items.name AS item_name', 
             'items.price', 
             'item_purchase.id AS pivot_id', 
             'item_purchase.item_id', 

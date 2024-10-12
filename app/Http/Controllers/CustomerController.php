@@ -13,18 +13,26 @@ use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
+     /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function viewCustomers(Request $request)
+    {
+        $customers = Customer::query()
+        ->select('*')
+        ->get();
+
+    return response()->json($customers);
+}
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function viewCustomerItems(Request $request)
     {
-    //顧客
-        // $customers = Customer::query()
-        // ->select('*')
-        // ->get();
-
         //直接書くやり方
     $orders = Customer::query()
     ->leftJoin('purchases', 'customers.id', '=', 'purchases.customer_id')
@@ -53,15 +61,13 @@ class CustomerController extends Controller
     })->values();
     
     return response()->json($groupedOrders);
- 
-
 }
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create(StoreCustomerRequest $request)
     {
 
         $customer = new Customer();
@@ -81,7 +87,6 @@ class CustomerController extends Controller
         $customer->fill($customerCreateArray);
         $customer->save();
 
-        
         return response()->json($customer);
     }
 
@@ -91,7 +96,7 @@ class CustomerController extends Controller
      * @param  \App\Http\Requests\StoreCustomerRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreCustomerRequest $request)
     {
         $customer = new Customer();
 
@@ -142,7 +147,7 @@ class CustomerController extends Controller
      * @param  \App\Models\Customer  $customer
      * @return \Illuminate\Http\Response
      */
-    public function update(int $customerId, Request $request)
+    public function update(int $customerId,UpdateCustomerRequest $request)
     {
         $customer = Customer::query()->find($customerId);
 

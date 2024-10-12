@@ -42,7 +42,8 @@ Route::get('analysisRfm', [AnalysisRfmController::class, 'index']);
 Route::get('getArray', [getArrayController::class, 'index']);
 
 Route::prefix('items')->controller(ItemController::class)->group(function () {
-    Route::get('/', 'index')->name('index');          // GET /api/items
+    Route::get('/view', 'viewItems')->name('viewItems');  // GET /api/items/view       
+    Route::get('/viewItemCustomers', 'viewItemCustomers')->name('viewItemCustomers');// GET /api/items/viewItemCustomers
     Route::get('create', 'create')->name('create');   // GET /api/items/create
     Route::post('/', 'store')->name('store');        // POST /api/items
     Route::get('{item}', 'show')->name('show');       // GET /api/items/{item}
@@ -53,7 +54,8 @@ Route::prefix('items')->controller(ItemController::class)->group(function () {
 });
 
 Route::prefix('customers')->controller(CustomerController::class)->group(function () {
-    Route::get('/', 'index')->name('index'); // GET /api/customers
+    Route::get('/view', 'viewCustomers')->name('index'); // GET /api/customers
+    Route::get('/viewCustomerItems', 'viewCustomerItems')->name('viewCustomerItems'); // GET /api/viewCustomerItems
     Route::get('create', 'create')->name('create'); // GET /api/customers/create
     Route::post('/', 'store')->name('store'); // POST /api/customers
     Route::get('{customer}', 'show')->name('show'); // GET /api/customers/{customer}
