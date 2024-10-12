@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use App\Models\Purchase;
 use App\Models\Item;
 use Illuminate\Support\Facades\DB;
+use App\Models\ItemPurchase;
+
 
 
 class CustomerController extends Controller
@@ -18,6 +20,7 @@ class CustomerController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function viewCustomers(Request $request)
     {
         $customers = Customer::query()
@@ -62,41 +65,42 @@ class CustomerController extends Controller
     
     return response()->json($groupedOrders);
 }
+
+
+  /**
+ * Retrieve the details of a specific customer, including their purchases and associated items.
+ *
+ * This method queries the database for the purchases made by a specific customer,
+ * retrieves the associated item purchases, and then gathers the details of those items.
+ *
+ * @param int $customerId The ID of the customer whose details are being retrieved.
+ * @param Request $request The HTTP request instance.
+ * @return JsonResponse A JSON response containing the customer's purchase details and associated items.
+ */
+public function getCustomerDetail(int $customerId, Request $request)
+{
+    
+    
+    // idの購入履歴を取得
+    $purchases = Purchase::query()
+    ->select('*')
+    ->where('customer_id', $customerId)
+    ->get();
+
+    /** @var int[] $purchaseIds*/
+    $purchaseIds = array_map(fn($purchases) => $purchases['id'], $purchases->toArray());
+    //  $purchaseIds = $purchases->pluck('id')->toArray();
+    dd($purchaseIds);
+
+
+}
+
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function create(StoreCustomerRequest $request)
-    {
-
-        $customer = new Customer();
-
-        $customerCreateArray = [
-
-            'name' => $request->name,
-            'kana' => $request->kana,
-            'tel' => $request->tel,
-            'email' => $request->email,
-            'postcode' => $request->postcode,
-            'address' => $request->address,
-            'birthday' => $request->birthday,
-            'gender' => $request->gender,
-            'memo' => $request->memo,
-        ];
-        $customer->fill($customerCreateArray);
-        $customer->save();
-
-        return response()->json($customer);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreCustomerRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreCustomerRequest $request)
     {
         $customer = new Customer();
 
@@ -125,17 +129,6 @@ class CustomerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Customer $customer)
-    {
-        return response()->json($customer);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Customer  $customer
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Customer $customer)
     {
         return response()->json($customer);
     }

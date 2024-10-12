@@ -76,33 +76,7 @@ class ItemController extends Controller
     
         return response()->json($item);
     }
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreItemRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-
-public function store(StoreItemRequest $request)
-{
-    $item = new Item();
-
-    $itemCreateArray = [
-        'name' => $request->name,
-        'memo' => $request->memo,
-        'price' => $request->price,
-        'is_selling' => $request->is_selling
-    ];
-
-    
-    $item->fill($itemCreateArray);
-    $item->save();
-
-  
-    return response()->json($item);
-}
-
-
+   
     /**
      * Display the specified resource.
      *
@@ -114,17 +88,7 @@ public function store(StoreItemRequest $request)
         return response()->json($item);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Item  $item
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Item $item)
-    {
-        return response()->json($item);
-    }
-
+  
     /**
      * Update the specified resource in storage.
      *

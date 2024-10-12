@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class AnalysisController extends Controller
 {
 
-        public function index(Request $request)
+        public function analysisDay(Request $request)
     {
 
         $startDate = $request->query('startDate'); 
@@ -26,6 +26,50 @@ class AnalysisController extends Controller
         ->selectRaw('date, SUM(totalPerPurchase) as total')
         ->get();
 
+        return response()->json($data);
+    }
+
+    public function analysisMonth(Request $request)
+    {
+
+        $startDate = $request->query('startDate'); 
+        $endDate = $request->query('endDate');
+
+        $subquery = Order::betweenDate($startDate, $endDate)
+        ->where('status', true)
+        //id毎にグループ化
+        ->groupBy('id')
+        ->selectRaw('id, SUM(subtotal) as totalPerPurchase,
+        DATE_FORMAT(created_at, "%Y%m") as date');
+
+    //2. サブクエリをgroupByで日毎にまとめる
+    $data = DB::table($subquery)
+        ->groupBy('date')
+        ->selectRaw('date, SUM(totalPerPurchase) as total')
+        ->get();
+        
+        return response()->json($data);
+    }
+
+    public function analysisYear(Request $request)
+    {
+
+        $startDate = $request->query('startDate'); 
+        $endDate = $request->query('endDate');
+
+        $subquery = Order::betweenDate($startDate, $endDate)
+        ->where('status', true)
+        //id毎にグループ化
+        ->groupBy('id')
+        ->selectRaw('id, SUM(subtotal) as totalPerPurchase,
+        DATE_FORMAT(created_at, "%Y") as date');
+
+    //2. サブクエリをgroupByで日毎にまとめる
+    $data = DB::table($subquery)
+        ->groupBy('date')
+        ->selectRaw('date, SUM(totalPerPurchase) as total')
+        ->get();
+                
         return response()->json($data);
     }
 

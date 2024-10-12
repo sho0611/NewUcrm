@@ -17,7 +17,7 @@ class PurchaseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function viewPurchase(Request $request)
     {
         $query = Purchase::query();
         $orders = $query->leftJoin('item_purchase', 'purchases.id', '=', 'item_purchase.purchase_id')
@@ -29,13 +29,12 @@ class PurchaseController extends Controller
             
         return response()->json($orders);
     }
-
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function viewPurchaseForm(Request $request)
     {
         $customers = Customer::select('id', 'name', 'kana')->get();
         $items = Item::select('id', 'name', 'price')->where('is_selling', true)->get();
@@ -52,7 +51,7 @@ class PurchaseController extends Controller
      * @param  \App\Http\Requests\StorePurchaseRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function createPurchaseForm(StorePurchaseRequest $request)
     {
         $purchase = new Purchase();
 
@@ -60,7 +59,6 @@ class PurchaseController extends Controller
             'customer_id' => $request->customer_id, 
             'status' => $request->status
         ];
-
         //purchaseテーブル
         $purchase->fill($purchaseCreateArray);
         $purchase->save();
@@ -86,32 +84,8 @@ class PurchaseController extends Controller
             ->where('purchases.id', $purchase->id) 
             ->groupBy('purchases.id')
             ->selectRaw('purchases.id as id, SUM(items.price * item_purchase.quantity) as total, customers.name as customer_name, customers.kana as customer_kana, purchases.status, purchases.created_at')
-            ->first(); // 1件の結果を取得
+            ->first(); 
 
-    
-        return response()->json($orders);
-    }
-    
-    
-    
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Purchase  $purchase
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Purchase $purchase)
-    {
-        $orders = Purchase::query()
-            ->leftJoin('item_purchase', 'purchases.id', '=', 'item_purchase.purchase_id')
-            ->leftJoin('items', 'item_purchase.item_id', '=', 'items.id')
-            ->leftJoin('customers', 'purchases.customer_id', '=', 'customers.id')
-            ->where('purchases.id', $purchase->id) 
-            ->groupBy('purchases.id')
-            ->selectRaw('purchases.id as id, SUM(items.price * item_purchase.quantity) as total, customers.name as customer_name, customers.kana as customer_kana, purchases.status, purchases.created_at')
-            ->first(); // 1件の結果を取得
-    
         return response()->json($orders);
     }
 
@@ -122,7 +96,7 @@ class PurchaseController extends Controller
      * @param  \App\Models\Purchase  $purchase
      * @return \Illuminate\Http\Response
      */
-    public function update(int $requestId, Request $request)
+    public function update(int $requestId, UpdatePurchaseRequest $request)
     {
         $purchase = Purchase::query()->findOrFail($requestId);
 
