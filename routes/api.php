@@ -42,6 +42,7 @@ Route::get('analysisRfm', [AnalysisRfmController::class, 'index']);
 Route::prefix('items')->controller(ItemController::class)->group(function () {
     Route::get('/view', 'viewItems')->name('viewItems');  // GET /api/items/view       
     Route::get('/viewItemCustomers', 'viewItemCustomers')->name('viewItemCustomers');// GET /api/items/view
+    Route::get('/{item}/get', 'getItemDetail')->name('getItemDetail');// GET /api/items/view
     Route::get('create', 'create')->name('create');   // GET /api/items/create
     Route::get('{item}', 'show')->name('show');       // GET /api/items/{item}
     Route::put('{item}', 'update')->name('update');   // PUT /api/items/{item}

@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
+use App\Models\Customer;
 use App\Models\Item;
 use Illuminate\Http\Request;
 use App\Rules\ItemsRule;
 use Illuminate\Support\Facades\Log;
-
-
+use App\Models\ItemPurchase;
+use App\Models\Purchase;
+use GuzzleHttp\Psr7\Query;
 
 class ItemController extends Controller
 {  /**
@@ -53,7 +55,7 @@ class ItemController extends Controller
         })->values();
         return response()->json($itemOrders);
     }
-    
+       
     /**
      * Show the form for creating a new resource.
      *
