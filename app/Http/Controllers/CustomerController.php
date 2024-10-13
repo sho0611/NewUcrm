@@ -67,33 +67,50 @@ class CustomerController extends Controller
 }
 
 
-  /**
- * Retrieve the details of a specific customer, including their purchases and associated items.
- *
- * This method queries the database for the purchases made by a specific customer,
- * retrieves the associated item purchases, and then gathers the details of those items.
- *
- * @param int $customerId The ID of the customer whose details are being retrieved.
- * @param Request $request The HTTP request instance.
- * @return JsonResponse A JSON response containing the customer's purchase details and associated items.
- */
-public function getCustomerDetail(int $customerId, Request $request)
-{
-    
-    
-    // idの購入履歴を取得
-    $purchases = Purchase::query()
-    ->select('*')
-    ->where('customer_id', $customerId)
-    ->get();
+    /**
+     * Retrieve the details of a specific customer, including their purchases and associated items.
+     *
+     * This method queries the database for the purchases made by a specific customer,
+     * retrieves the associated item purchases, and then gathers the details of those items.
+     *
+     * @param int $customerId The ID of the customer whose details are being retrieved.
+     * @param Request $request The HTTP request instance.
+     * @return JsonResponse A JSON response containing the customer's purchase details and associated items.
+     */
+    public function getCustomerDetail(int $customerId, Request $request)
+    {
+        // idの購入履歴を取得
+        $purchases = Purchase::query()
+        ->select('*')
+        ->where('customer_id', $customerId)
+        ->get();
 
-    /** @var int[] $purchaseIds*/
-    $purchaseIds = array_map(fn($purchases) => $purchases['id'], $purchases->toArray());
-    //  $purchaseIds = $purchases->pluck('id')->toArray();
-    dd($purchaseIds);
+        /** @var int[] $purchaseIds*/
+        //purchases.idを配列にして取得
+        $purchaseIds = array_map(fn($purchases) => $purchases['id'], $purchases->toArray());
+        //  $purchaseIds = $purchases->pluck('id')->toArray();
 
+        $itemPurchases = ItemPurchase::query()
+        ->select('*')
+        ->whereIn('purchase_id', $purchaseIds)
+        ->get();
 
-}
+        /** @var int[] $purchaseIds*/
+        //item_idを配列にして取得
+        $itemIds = array_map(fn($itemPurchases):int => $itemPurchases['item_id'], $itemPurchases->toArray());
+        $uniqueItemIds = array_unique($itemIds);
+
+        $items = Item::query()
+        ->select('*')
+        ->whereIn('id', $uniqueItemIds)
+        ->get();
+
+        $purchaseArray = $purchases->toArray();
+        //新しいキーitemsを追加し、itemsの配列を代入
+        $purchaseArray['items'] = $items->toArray();
+        
+        return response()->json($purchaseArray);
+    }
 
     /**
      * Show the form for creating a new resource.
