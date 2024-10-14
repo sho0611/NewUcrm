@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Purchase;
+use App\Models\Review;
 
 class Customer extends Model
 {
@@ -15,6 +16,11 @@ class Customer extends Model
     public function purchases()
     {
         return $this->hasMany(Purchase::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 
 

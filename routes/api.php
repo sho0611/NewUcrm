@@ -8,8 +8,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\AnalysisController;
 use App\Http\Controllers\AnalysisDesileController;
 use App\Http\Controllers\AnalysisRfmController;
-use App\Models\Purchase;
-
+use App\Http\Controllers\ReviewController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -69,6 +68,20 @@ Route::prefix('purchases')->controller(PurchaseController::class)->group(functio
     Route::put('{purchase}', 'update')->name('update'); // PUT /api/purchases/{purchase}
     Route::delete('{purchase}', 'destroy')->name('destroy'); // DELETE /api/purchases/{purchase}
 });
+
+//レビュー関連
+Route::prefix('reviews')->controller(ReviewController::class)->group(function()  {
+    Route::get('/view', 'viewReviews')->name('viewReviews');//GET /api/reviews/view
+    Route::get('/{reviews}/viewItem', 'viewItemReviews')->name('viewItemReviews');//GET /api/reviews/{reviews}/viewItem
+    Route::get('/create', 'create')->name('create');//GET /api/reviews/create
+    Route::put('/{reviews}', 'update')->name('update');//GET /api/reviews/{reviews}/show
+
+
+
+    
+
+});
+
 
 
 

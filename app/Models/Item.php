@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Purchase;
+use App\Models\Review;
 
 class Item extends Model
 {
@@ -12,12 +13,19 @@ class Item extends Model
 
     protected $fillable = ['name', 'memo', 'price', 'is_selling'];
 
+    //リレーション
     public function purchases()
     { 
         return $this->belongsToMany(Purchase::class)
         ->withPivot('quantity');
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    //スコープ
     public function scopeItemCustomers($query)
     {
         return $query->select(
