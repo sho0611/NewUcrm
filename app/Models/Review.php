@@ -11,7 +11,7 @@ class Review extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['id', 'customer_id', 'item_id', 'rating', 'comment'];
+    protected $fillable = ['service_id', 'customer_name' , 'rating', 'comment'];
 
     public function customer()
     {
@@ -20,6 +20,6 @@ class Review extends Model
     
     public function item()
     {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(Item::class,'service_id');
     }
 }
