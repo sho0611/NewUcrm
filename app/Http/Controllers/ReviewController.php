@@ -10,6 +10,29 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
+        /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \App\Http\Requests\StoreReviewRequest  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function create(StoreReviewRequest $request)
+    {
+        $reviews = new Review();
+
+        $reviewCreateArray = [
+            'customer_id' => $request->customer_id,
+            'item_id' => $request->item_id,
+            'rating' => $request->rating,
+            'comment' => $request->comment
+        ];
+        $reviews->fill($reviewCreateArray);
+        $reviews->save();
+
+        return response()->json($reviews);
+    }
+    
+
     /**
      * Display a listing of the resource.
      *
@@ -39,25 +62,5 @@ class ReviewController extends Controller
         return response()->json($reviews);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreReviewRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function create(StoreReviewRequest $request)
-    {
-        $reviews = new Review();
 
-        $reviewCreateArray = [
-            'customer_id' => $request->customer_id,
-            'item_id' => $request->item_id,
-            'rating' => $request->rating,
-            'comment' => $request->comment
-        ];
-        $reviews->fill($reviewCreateArray);
-        $reviews->save();
-
-        return response()->json($reviews);
-    }
 }

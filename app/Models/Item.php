@@ -25,6 +25,13 @@ class Item extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'service_id', 'id'); 
+    }
+
+
+
     //スコープ
     public function scopeItemCustomers($query)
     {

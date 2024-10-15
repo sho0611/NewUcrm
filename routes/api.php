@@ -9,6 +9,7 @@ use App\Http\Controllers\AnalysisController;
 use App\Http\Controllers\AnalysisDesileController;
 use App\Http\Controllers\AnalysisRfmController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\AppointmentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -73,13 +74,21 @@ Route::prefix('purchases')->controller(PurchaseController::class)->group(functio
 Route::prefix('reviews')->controller(ReviewController::class)->group(function()  {
     Route::get('/view', 'viewReviews')->name('viewReviews');//GET /api/reviews/view
     Route::get('/{reviews}/viewItem', 'viewItemReviews')->name('viewItemReviews');//GET /api/reviews/{reviews}/viewItem
+    
     Route::get('/create', 'create')->name('create');//GET /api/reviews/create
     Route::put('/{reviews}', 'update')->name('update');//GET /api/reviews/{reviews}/show
+});
 
+//予約関係
+Route::prefix('app')->controller(AppointmentController::class)->group(function()  {
+    //顧客側//予約フーム
+    Route::get('/', 'formAppointment')->name('formAppointment');
+    Route::get('/create', 'createAppointment')->name('createAppointment');
 
-
-    
-
+    //店側//予約検索
+    Route::get('search/service', 'searchAppointmentService')->name('searchAppointmentService');
+    Route::get('search/date', 'searchAppointmentDay')->name('searchAppointmentDay');
+    Route::get('search', 'searchDayItem')->name('searchDayItem');    
 });
 
 

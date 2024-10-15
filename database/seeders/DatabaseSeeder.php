@@ -5,9 +5,9 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Customer;
-use App\Models\Food;
 use App\Models\Purchase;
 use App\Models\Item;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -20,7 +20,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             ItemSeeder::class,
-            ReviewSeeder::class
+            ReviewSeeder::class,
+            AppointmentSeeder::class
         ]);
 
          \App\Models\Customer::factory(150)->create();
@@ -34,15 +35,5 @@ class DatabaseSeeder extends Seeder
                  ['quantity' => rand(1, 5)] 
              );
          });
-
-
-
-
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
-
-
-
     }
 }
