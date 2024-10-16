@@ -70,20 +70,15 @@ Route::prefix('purchases')->controller(PurchaseController::class)->group(functio
     Route::delete('{purchase}', 'destroy')->name('destroy'); // DELETE /api/purchases/{purchase}
 });
 
-//レビュー関連
-Route::prefix('reviews')->controller(ReviewController::class)->group(function()  {
-    Route::get('/view', 'viewReviews')->name('viewReviews');//GET /api/reviews/view
-    Route::get('/{reviews}/viewItem', 'viewItemReviews')->name('viewItemReviews');//GET /api/reviews/{reviews}/viewItem
-    
-    Route::get('/create', 'create')->name('create');//GET /api/reviews/create
-    Route::put('/{reviews}', 'update')->name('update');//GET /api/reviews/{reviews}/show
-});
-
 //予約関係
 Route::prefix('app')->controller(AppointmentController::class)->group(function()  {
-    //顧客側//予約フーム
-    Route::get('/', 'formAppointment')->name('formAppointment');
+    //それぞれのidに紐ずくデータを取得しjson送信
+    Route::get('/form', 'AppointmentForm')->name('AppointmentForm');
+    //顧客側//予約フォーム
     Route::get('/create', 'createAppointment')->name('createAppointment');
+
+    //予約フォーム表示
+    Route::get('available-times', 'getAvailableTimes')->name('getAvailableTimes');
 
     //店側//予約検索
     Route::get('search/service', 'searchAppointmentService')->name('searchAppointmentService');

@@ -20,7 +20,16 @@ return new class extends Migration
             ->onUpdate('cascade') 
             ->onDelete('cascade');
 
-            $table->string('customer_name');
+            $table->foreignId('customer_id')
+            ->constrained()
+            ->onUpdate('cascade') 
+            ->onDelete('cascade');
+
+            $table->foreignId('staff_id')
+            ->constrained()
+            ->onUpdate('cascade') 
+            ->onDelete('cascade');
+
             $table->date('appointment_date');
             $table->time('appointment_time'); 
             $table->timestamps();

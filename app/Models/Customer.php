@@ -23,6 +23,11 @@ class Customer extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function appintments()
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
 
     public function scopeCustomerItems($query)
     {

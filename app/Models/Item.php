@@ -20,10 +20,6 @@ class Item extends Model
         ->withPivot('quantity');
     }
 
-    public function reviews()
-    {
-        return $this->hasMany(Review::class);
-    }
 
     public function appointments()
     {
