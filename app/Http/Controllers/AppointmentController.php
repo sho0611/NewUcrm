@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\Item;
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use App\Models\Staff;
 
 class AppointmentController extends Controller
 {
@@ -104,7 +105,27 @@ public function getAvailableTimes(Request $request)
 
     $availableTimes = array_diff($times, $reservedTimes);
 
-    return response()->json(['availableTimes' => array_values($availableTimes)]); // 修正
+    $staffAvailability = [];
+    foreach ($availableTimes as $tiem)
+    {
+        $staffAvailability = [];
+
+        foreach ($availableTimes as $time) {
+            $staffAvailability[$time] = Staff::whereNotIn('id', function ($query) use ($appointDate, $time) {
+                $query->select('staff_id')
+                    ->from('appointments')
+                    ->join('items', 'appointments.service_id', '=', 'items.id')
+                    ->where('appointment_date', $appointDate)
+                    ->where('appointment_time', '<=', $time)
+                    
+                    ->whereRaw("DATE_ADD(appointment_time, INTERVAL items.duration MINUTE) > '{$time}'");
+            })->pluck('name'); // 空いているスタッフの名前を取得
+        }
+    }
+    return response()->json([
+        'availableTimes' => array_values($availableTimes),
+        '$staffAvailability' => $staffAvailability
+    ]); 
 }
 
 
