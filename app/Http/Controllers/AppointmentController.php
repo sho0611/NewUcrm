@@ -56,53 +56,58 @@ class AppointmentController extends Controller
         return response()->json($appointments);
     }
 
-    public function getAvailableTimes(Request $request)
+//http://127.0.0.1:8000/api/app/available-times?app_date=2024-10-20
+public function getAvailableTimes(Request $request)
+{
+    $appointDate = $request->query('app_date');
+
+    // 営業時間
+    $startTime = new \DateTime('09:00');
+    $endTime = new \DateTime('18:00');
+
+    // '09:00'から'18:00'までの15分間隔の時間
+    $interval = new \DateInterval('PT15M');
+    $times = [];
+    while ($startTime < $endTime) 
     {
-        $appointDate = $request->query('app_date');
+        $times[] = $startTime->format('H:i'); // 修正
+        $startTime->add($interval);
+    }
 
-        //営業時間
-        $startTime = new \DateTime('09:00');
-        $endTime = new \DateTime('18:00');
-
-        //初期値を設定
-        $interval = new \DateInterval('PT30M');
-        // 30分刻みの全ての時間帯をリストアップ
-        $times = [];
-        while($startTime < $endTime) {
-            $times[] = $startTime->format('H:i');
-            $startTime->add($interval);
-        }
-
-        // 指定された日の予約を取得
-        $appointments = Appointment::with('item')
+    // 予約日を取得
+    $appointments = Appointment::with('item')
         ->where('appointment_date', $appointDate)
         ->get();
 
-        $reservedTimes = [];
+    // 各予約時間を配列でリストアップ
+    $reservedTimes = [];
+    foreach ($appointments as $appointment) 
+    {
+        // 12:30:00 
+        $appointmentStartTime = new \DateTime($appointment->appointment_time); // 修正
+        // 90
+        $itemDuration = $appointment->item->duration;
+        // 12:30:00
+        $appointmentEndTime = clone $appointmentStartTime;
+        // 12:30:00<-90 //$appointmentEndTime = 14:00:00
+        $appointmentEndTime->add(new \DateInterval("PT{$itemDuration}M"));
 
-        foreach ($appointments as $appointment) {
-            $appointmentStartTime = new \DateTime($appointment->appointment_time);
-            $itemDuration = $appointment->item->duration;
-            $appointmentEndTime = clone $appointmentStartTime;
-            $appointmentEndTime->add(new \DateInterval('PT' . $itemDuration . 'M'));
-
-            while($appointmentStartTime < $appointmentEndTime) {
-                $reservedTimes[] = $appointmentStartTime->format('H:I');
-                $appointmentStartTime->add(new \DateInterval('PT30M'));
-            }
+        // 12:30:00           //14:00:00
+        while ($appointmentStartTime < $appointmentEndTime)
+        {
+            // [12:30]
+            $reservedTimes[] = $appointmentStartTime->format('H:i');
+            // [12:30<-add(15),12:45<-add(15)...]
+            $appointmentStartTime->add($interval);
         }
-        $reservedTimes = $appointments->pluck('appointment_time')
-            ->map(function ($time) {
-                return \Carbon\Carbon::createFromFormat('H:i:s', $time)->format('H:i');
-            })->toArray();
- 
-        $availableTimes = array_diff($times, $reservedTimes);
-
-
-        return response()->json([
-            'available_times' => $availableTimes
-        ]);
     }
+
+    $availableTimes = array_diff($times, $reservedTimes);
+
+    return response()->json(['availableTimes' => array_values($availableTimes)]); // 修正
+}
+
+
     //
       /**
      * Display a listing of the resource.
