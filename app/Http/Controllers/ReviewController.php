@@ -11,8 +11,14 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
+      /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function reviewForm(Request $request)
     {
+        //itemも同時に渡すことで、サービス名を入力する際に、idを選択できるようにする
         $reviews = Review::with(['item'])->get();
         return response()->json($reviews);
     }
@@ -26,6 +32,7 @@ class ReviewController extends Controller
 
     public function createReview(StoreReviewRequest $request)
     {
+        //実際にはサービス名で入力を受け取るが、dbではidで保存したい場合
         $item = Item::where('name', $request->service_id)->first();
 
         if (empty($item)) {
@@ -44,6 +51,7 @@ class ReviewController extends Controller
         $reviews->fill($reviewCreateArray);
         $reviews->save();
 
+        //レスポンス202はこれでいいのか
         return response()->json($reviews ,200);
     }
 
