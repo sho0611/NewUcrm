@@ -27,6 +27,40 @@ class ItemController extends Controller
 
         return response()->json($items);
    }
+
+   /**
+    * Display a listing of the resource.
+    *
+    * @return \Illuminate\Http\Response
+    */
+    public function geItemDetail(int $itemsId, Request $request)
+    {
+        $itemPurchase = ItemPurchase::query()
+        ->select('*')
+        ->where('item_id', $itemsId)
+        ->get();
+
+        $purchase_id = array_map(fn($itemPurchase) =>  $itemPurchase['purchase_id'], $itemPurchase->toArray());
+
+        $purchases = Purchase::query()
+        ->select('*')
+        ->whereIn('id', $purchase_id)
+        ->get();
+
+        $customer_id = array_map(fn($purchases) => $purchases['customer_id'], $purchases->toArray());
+        $uniqueCustomerIds = array_unique($customer_id);
+
+        $customers = Customer::query();
+        $customers->selct('*')
+        ->whereIn('id', $uniqueCustomerIds)
+        ->get();
+
+        $purchaseArray = $purchases->toArray();
+        $purchaseArray['customers'] = $customers->toArray();
+
+        return response()->json($purchaseArray);
+
+    } 
    
     /**
      * Show the form for creating a new resource.
