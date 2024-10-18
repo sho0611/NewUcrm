@@ -34,6 +34,7 @@ class AppointmentController extends Controller
     public function createAppointment(StoreAppointmentRequest $request)
     {
 
+        //顧客名をidとして保存したい
         $customerName = $request->customer_name;
         $customer = Customer::where('name', $customerName)->first();
 
