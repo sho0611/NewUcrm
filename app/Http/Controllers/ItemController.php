@@ -25,37 +25,9 @@ class ItemController extends Controller
         ->select('*')
         ->get();
 
-            return response()->json($items);
+        return response()->json($items);
    }
    
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function viewItemCustomers(Request $request)
-    {
-    $orders = Item::itemCustomers()->take(1000)->get();
-  
-    $itemOrders = $orders->groupBy('item_id')->map(function ($group) {
-    $firstItem = $group->first();
-
-            return [
-                'item_id' => $firstItem->item_id,
-                'name' => $firstItem->item_name, 
-                'customers' => $group->map(function ($customer) {
-                    return [
-                        'customer_id' => $customer->customer_id,
-                        'customer_name' => $customer->customer_name,
-                        'customer_kana' => $customer->customer_kana, 
-                        'customer_tel' => $customer->customer_tel,
-                    ];
-                }),
-            ];
-        })->values();
-        return response()->json($itemOrders);
-    }
-       
     /**
      * Show the form for creating a new resource.
      *
