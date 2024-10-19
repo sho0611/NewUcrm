@@ -12,7 +12,7 @@ use App\Models\Staff;
 
 class AppointmentController extends Controller
 {
-         /**
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -94,7 +94,7 @@ public function getAvailableTimes(Request $request)
         // 12:30:00<-90 //$appointmentEndTime = 14:00:00
         $appointmentEndTime->add(new \DateInterval("PT{$itemDuration}M"));
 
-        // 12:30:00           //14:00:00
+               // 12:30:00           //14:00:00
         while ($appointmentStartTime < $appointmentEndTime)
         {
             // [12:30]
@@ -107,10 +107,6 @@ public function getAvailableTimes(Request $request)
     $availableTimes = array_diff($times, $reservedTimes);
 
     $staffAvailability = [];
-    foreach ($availableTimes as $tiem)
-    {
-        $staffAvailability = [];
-
         foreach ($availableTimes as $time) {
             $staffAvailability[$time] = Staff::whereNotIn('id', function ($query) use ($appointDate, $time) {
                 $query->select('staff_id')
@@ -122,7 +118,7 @@ public function getAvailableTimes(Request $request)
                     ->whereRaw("DATE_ADD(appointment_time, INTERVAL items.duration MINUTE) > '{$time}'");
             })->pluck('name'); // 空いているスタッフの名前を取得
         }
-    }
+    
     return response()->json([
         'availableTimes' => array_values($availableTimes),
         '$staffAvailability' => $staffAvailability

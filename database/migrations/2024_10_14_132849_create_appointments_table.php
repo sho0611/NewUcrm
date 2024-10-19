@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
+            
             $table->foreignId('service_id')
             ->constrained('items')
             ->onUpdate('cascade') 
