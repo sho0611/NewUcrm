@@ -74,7 +74,6 @@ Route::prefix('purchases')->controller(PurchaseController::class)->group(functio
 //レビュー関連
 Route::prefix('reviews')->controller(ReviewController::class)->group(function()  {
     //顧客側
-    //
     Route::get('/form', 'reviewForm')->name('reviewForm');
     Route::post('/create', 'createReview')->name('createReview');
     
