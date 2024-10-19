@@ -20,10 +20,13 @@ class Item extends Model
         ->withPivot('quantity');
     }
 
-    public function reviews()
+
+    public function appointments()
     {
-        return $this->hasMany(Review::class, 'service_id');
+        return $this->hasMany(Appointment::class, 'service_id', 'id'); 
     }
+
+
 
     //スコープ
     public function scopeItemCustomers($query)

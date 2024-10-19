@@ -4,10 +4,10 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Customer;
-use App\Models\Food;
 use App\Models\Purchase;
 use App\Models\Item;
+
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -20,11 +20,12 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             ItemSeeder::class,
-            ReviewSeeder::class
+            StaffSeeder::class,
         ]);
 
          \App\Models\Customer::factory(150)->create();
-
+         \App\Models\Appointment::factory(500)->create();
+       
          $items = Item::all();
 
          Purchase::factory(10000)->create()
@@ -34,6 +35,5 @@ class DatabaseSeeder extends Seeder
                  ['quantity' => rand(1, 5)] 
              );
          });
-
     }
 }

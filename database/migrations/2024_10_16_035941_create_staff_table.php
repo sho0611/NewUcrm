@@ -13,17 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('items', function (Blueprint $table) {
-            $table->unsignedBigInteger('item_id')->primary();
+        Schema::create('staff', function (Blueprint $table) {
+            $table->id();
             $table->string('name');
-            $table->string('memo')->nullable();
-            $table->integer('price');
-            $table->boolean('is_selling')->default(true);
-            $table->integer('duration');
+            $table->string('memo');
             $table->timestamps();
         });
     }
-    
 
     /**
      * Reverse the migrations.
@@ -32,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('items');
+        Schema::dropIfExists('staff');
     }
 };
