@@ -9,7 +9,8 @@ use App\Http\Controllers\AnalysisController;
 use App\Http\Controllers\AnalysisDesileController;
 use App\Http\Controllers\AnalysisRfmController;
 use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AppointmentController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -73,7 +74,7 @@ Route::prefix('purchases')->controller(PurchaseController::class)->group(functio
 });
 
 //予約関係
-Route::prefix('app')->controller(AppointmentController::class)->group(function()  {
+Route::prefix('app')->controller(ReviewController::class)->group(function()  {
     //それぞれのidに紐ずくデータを取得しjson送信
     Route::get('/form', 'AppointmentForm')->name('AppointmentForm');
     //顧客側//予約フォーム
