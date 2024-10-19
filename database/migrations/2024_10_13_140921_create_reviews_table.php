@@ -13,16 +13,21 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('purchases', function (Blueprint $table) {
-            $table->unsignedBigInteger('purchase_id')->primary();
-            $table->foreignId('customer_id')
-                ->onUpdate('cascade')
-                ->onDelete('cascade'); 
-            $table->boolean('status');
+        Schema::create('reviews', function (Blueprint $table) {
+            
+            $table->unsignedBigInteger('review_id')->primary();
+            $table->foreignId('item_id')
+            ->onUpdate('cascade')
+            ->onDelete('cascade'); 
+
+            $table->string('customer_name');
+
+            $table->integer('rating');
+            $table->text('comment')->nullable(); 
             $table->timestamps();
         });
     }
-    
+
     /**
      * Reverse the migrations.
      *
@@ -30,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('purchases');
+        Schema::dropIfExists('reviews');
     }
 };

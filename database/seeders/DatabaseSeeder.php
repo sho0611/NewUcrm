@@ -20,28 +20,20 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             ItemSeeder::class,
+            ReviewSeeder::class
         ]);
 
-         \App\Models\Customer::factory(1500)->create();
+         \App\Models\Customer::factory(150)->create();
 
          $items = Item::all();
 
-         Purchase::factory(30000)->create()
+         Purchase::factory(10000)->create()
          ->each(function (Purchase $purchase) use ($items) {
              $purchase->items()->attach(
                  $items->random(rand(1, 3))->pluck('id')->toArray(),
                  ['quantity' => rand(1, 5)] 
              );
          });
-
-
-
-
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
-
-
 
     }
 }

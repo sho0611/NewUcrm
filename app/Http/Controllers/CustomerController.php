@@ -111,8 +111,26 @@ class CustomerController extends Controller
         
         return response()->json($purchaseArray);
     }
-
     /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Customer  $customer
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Customer $customer)
+    {
+        return response()->json($customer);
+    }
+
+
+    // 会員登録フォームを表示するメソッド
+    public function showRegistrationForm()
+    {
+        return view('auth.register'); // 会員登録フォームのビューを返す
+    }
+
+    //会員登録処理
+       /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
@@ -136,21 +154,11 @@ class CustomerController extends Controller
         $customer->fill($customerCreateArray);
         $customer->save();
 
-        return response()->json($customer);
+        //return response()->json($customer);
+        return redirect()->route('reviews.create', ['customer_id' => $customer->id]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Customer  $customer
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Customer $customer)
-    {
-        return response()->json($customer);
-    }
-
-    /**
+        /**
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\UpdateCustomerRequest  $request
@@ -177,7 +185,7 @@ class CustomerController extends Controller
         return response()->json($customer);
     }
 
-    /**
+        /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Customer  $customer
@@ -188,4 +196,5 @@ class CustomerController extends Controller
         $customer->delete();
         return response()->json($customer);
     }
+    
 }

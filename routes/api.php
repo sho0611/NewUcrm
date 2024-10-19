@@ -8,7 +8,8 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\AnalysisController;
 use App\Http\Controllers\AnalysisDesileController;
 use App\Http\Controllers\AnalysisRfmController;
-use App\Models\Purchase;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +58,7 @@ Route::prefix('customers')->controller(CustomerController::class)->group(functio
     Route::get('{customer}', 'show')->name('show'); // GET /api/customers/{customer}
     Route::put('{customer}', 'update')->name('update'); //PUT /api/customers/{customer}
     Route::delete('{customer}', 'destroy')->name('destroy');// DELETE /api/customers/{customer}
+    Route::get('/register', 'showRegistrationForm')->name('register');
 });
 
 //Purchase関連
@@ -68,6 +70,23 @@ Route::prefix('purchases')->controller(PurchaseController::class)->group(functio
     Route::put('{purchase}', 'update')->name('update'); // PUT /api/purchases/{purchase}
     Route::delete('{purchase}', 'destroy')->name('destroy'); // DELETE /api/purchases/{purchase}
 });
+
+//レビュー関連
+Route::prefix('reviews')->controller(ReviewController::class)->group(function()  {
+    //顧客側
+    //
+    Route::get('/form', 'reviewForm')->name('reviewForm');
+    Route::post('/create', 'createReview')->name('createReview');
+    
+    //店側
+    //レビューを見る
+    Route::get('/view', 'viewReviews')->name('viewReviews');
+    //Itemごとのレビューを見る
+    Route::get('/{reviews}/viewItem', 'viewItemReviews')->name('viewItemReviews');
+});
+
+
+
 
 
 

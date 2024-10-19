@@ -14,13 +14,15 @@ return new class extends Migration
     public function up()
     {
         Schema::create('item_purchase', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('item_id')->constrained()
+            $table->unsignedBigInteger('item_purchase_id')->primary();
+            $table->foreignId('item_id')
                 ->onUpdate('cascade')
                 ->onDelete('cascade'); 
-            $table->foreignId('purchase_id')->constrained()
+
+            $table->foreignId('purchase_id')
                 ->onUpdate('cascade')
                 ->onDelete('cascade'); 
+                
             $table->integer('quantity');
             $table->timestamps();
         });
