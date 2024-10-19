@@ -45,7 +45,7 @@ class AppointmentController extends Controller
         $appointments = new Appointment();
         
         $createAppointments = [
-            'service_id' => $request->service_id,
+            'item_id' => $request->item_id,
             'customer_id' => $customer->id,
             'staff_id' => $request->staff_id,
             'appointment_date' => $request->appointment_date,
@@ -114,7 +114,6 @@ public function getAvailableTimes(Request $request)
                     ->join('items', 'appointments.service_id', '=', 'items.id')
                     ->where('appointment_date', $appointDate)
                     ->where('appointment_time', '<=', $time)
-                    
                     ->whereRaw("DATE_ADD(appointment_time, INTERVAL items.duration MINUTE) > '{$time}'");
             })->pluck('name'); // 空いているスタッフの名前を取得
         }

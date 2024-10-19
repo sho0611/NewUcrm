@@ -14,9 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('appointments', function (Blueprint $table) {
-            $table->id();
+
+            $table->unsignedBigInteger('appointment_id')->primary(); 
             
-            $table->foreignId('service_id')
+            $table->foreignId('item_id')
             ->constrained('items')
             ->onUpdate('cascade') 
             ->onDelete('cascade');
