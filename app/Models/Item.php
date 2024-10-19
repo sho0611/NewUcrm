@@ -23,7 +23,11 @@ class Item extends Model
 
     public function appointments()
     {
+<<<<<<< HEAD
         return $this->hasMany(Appointment::class, 'service_id', 'id'); 
+=======
+        return $this->hasMany(Review::class, 'service_id');
+>>>>>>> review
     }
 
 

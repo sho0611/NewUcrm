@@ -14,15 +14,16 @@ return new class extends Migration
     public function up()
     {
         Schema::create('items', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('item_id')->primary();
             $table->string('name');
             $table->string('memo')->nullable();
             $table->integer('price');
             $table->boolean('is_selling')->default(true);
             $table->integer('duration');
             $table->timestamps();
-            });
+        });
     }
+    
 
     /**
      * Reverse the migrations.

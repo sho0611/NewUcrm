@@ -19,24 +19,41 @@ class ReviewSeeder extends Seeder
         $comments = [
             '素晴らしい商品でした！',
             'とても満足しています。',
-            '再度購入したいです。',
+            'また利用したいです',
             '品質が良く、値段も手ごろです。',
             '期待以上の効果がありました。',
             '友人にも勧めたいです。',
-            '配送が早くて助かりました。',
+            '店員さんが優しかったです',
             'またリピートします。',
             '使いやすくて便利です。',
             'お値段以上の価値がありました。',
         ];
 
+        $customerNames = [
+            'ジロー',
+            'ハナ',
+            'アキ',
+            'ケン',
+            'ナオ',
+            'エミ',
+            'ジン',
+            'ミサキ',
+            'ユウタ',
+            'タカ',
+            'タロウ',
+            'サクラ',
+            'ユキ',
+            'コウタ',
+            'マリ',
+        ];
+    
 
-        $customerCount = 150;
-        $itemCount = 3;
+        $itemCount = 20;
 
         for ($i = 0; $i < 100; $i++) { 
             DB::table('reviews')->insert([
-                'customer_id' => rand(1, $customerCount), 
-                'item_id' => rand(1, $itemCount),        
+                'service_id' => rand(1, $itemCount),
+                'customer_name' => $customerNames[array_rand($customerNames)],     
                 'rating' => rand(1, 5),                   
                 'comment' => $comments[array_rand($comments)],
                 'created_at' => now(),

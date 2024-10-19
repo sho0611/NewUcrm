@@ -14,9 +14,14 @@ return new class extends Migration
     public function up()
     {
         Schema::create('reviews', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('customer_id')->constrained()->onDelete('cascade'); 
-            $table->foreignId('item_id')->constrained()->onDelete('cascade'); 
+            
+            $table->unsignedBigInteger('review_id')->primary();
+            $table->foreignId('item_id')
+            ->onUpdate('cascade')
+            ->onDelete('cascade'); 
+
+            $table->string('customer_name');
+
             $table->integer('rating');
             $table->text('comment')->nullable(); 
             $table->timestamps();

@@ -9,7 +9,8 @@ use App\Http\Controllers\AnalysisController;
 use App\Http\Controllers\AnalysisDesileController;
 use App\Http\Controllers\AnalysisRfmController;
 use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AuthController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -58,6 +59,7 @@ Route::prefix('customers')->controller(CustomerController::class)->group(functio
     Route::get('{customer}', 'show')->name('show'); // GET /api/customers/{customer}
     Route::put('{customer}', 'update')->name('update'); //PUT /api/customers/{customer}
     Route::delete('{customer}', 'destroy')->name('destroy');// DELETE /api/customers/{customer}
+    Route::get('/register', 'showRegistrationForm')->name('register');
 });
 
 //Purchase関連
@@ -68,6 +70,22 @@ Route::prefix('purchases')->controller(PurchaseController::class)->group(functio
     Route::get('{purchase}', 'show')->name('show'); // GET /api/purchases/{purchase}
     Route::put('{purchase}', 'update')->name('update'); // PUT /api/purchases/{purchase}
     Route::delete('{purchase}', 'destroy')->name('destroy'); // DELETE /api/purchases/{purchase}
+});
+
+//予約関係
+Route::prefix('app')->controller(AppointmentController::class)->group(function()  {
+    //それぞれのidに紐ずくデータを取得しjson送信
+    Route::get('/form', 'AppointmentForm')->name('AppointmentForm');
+    //顧客側//予約フォーム
+    Route::get('/create', 'createAppointment')->name('createAppointment');
+
+    //予約フォーム表示
+    Route::get('available-times', 'getAvailableTimes')->name('getAvailableTimes');
+
+    //店側//予約検索
+    Route::get('search/service', 'searchAppointmentService')->name('searchAppointmentService');
+    Route::get('search/date', 'searchAppointmentDay')->name('searchAppointmentDay');
+    Route::get('search', 'searchDayItem')->name('searchDayItem');    
 });
 
 //予約関係
