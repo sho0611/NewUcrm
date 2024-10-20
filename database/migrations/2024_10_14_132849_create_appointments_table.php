@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('appointments', function (Blueprint $table) {
 
-            $table->unsignedBigInteger('appointment_id')->primary(); 
+            $table->id('appointment_id'); 
             
             $table->foreignId('item_id')
             ->onUpdate('cascade') 

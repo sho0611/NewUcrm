@@ -9,6 +9,7 @@ use App\Models\Item;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Staff;
+use App\Notifications\AppointmentCreated;
 
 class AppointmentController extends Controller
 {
@@ -33,8 +34,6 @@ class AppointmentController extends Controller
      */
     public function createAppointment(StoreAppointmentRequest $request)
     {
-
-
         $appointments = new Appointment();
         
         $createAppointments = [
@@ -47,6 +46,13 @@ class AppointmentController extends Controller
         
         $appointments->fill($createAppointments);
         $appointments->save();
+
+        //顧客への通知を送信
+        //idから顧客の情報を取得
+        $customer = Customer::find($appointments->customer_id);
+
+        //顧客への通知を送信
+        $customer->notify(new AppointmentCreated($appointments));
     
         return response()->json($appointments);
     }

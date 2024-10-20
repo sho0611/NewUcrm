@@ -15,17 +15,17 @@ class Appointment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'service_id',
+        'item_id' ,
         'customer_id',
         'staff_id',
         'appointment_date',
-        'appointment_time'
+        'appointment_time' 
     ];
     
 
     public function item()
     {
-        return $this->belongsTo(Item::class, 'service_id', 'id'); 
+        return $this->belongsTo(Item::class); 
     }
 
     public function staff()
