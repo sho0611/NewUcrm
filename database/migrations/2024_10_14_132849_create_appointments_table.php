@@ -18,17 +18,14 @@ return new class extends Migration
             $table->unsignedBigInteger('appointment_id')->primary(); 
             
             $table->foreignId('item_id')
-            ->constrained('items')
             ->onUpdate('cascade') 
             ->onDelete('cascade');
 
             $table->foreignId('customer_id')
-            ->constrained()
             ->onUpdate('cascade') 
             ->onDelete('cascade');
 
             $table->foreignId('staff_id')
-            ->constrained()
             ->onUpdate('cascade') 
             ->onDelete('cascade');
 

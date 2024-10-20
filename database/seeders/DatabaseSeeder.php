@@ -19,21 +19,22 @@ class DatabaseSeeder extends Seeder
     {
 
         $this->call([
-            ItemSeeder::class,
-            StaffSeeder::class,
+            AdminSeeder::class,
+            // ItemSeeder::class,
+            // StaffSeeder::class,
         ]);
 
-         \App\Models\Customer::factory(150)->create();
-         \App\Models\Appointment::factory(500)->create();
+        //  \App\Models\Customer::factory(150)->create();
+        //  \App\Models\Appointment::factory(500)->create();
        
-         $items = Item::all();
+        //  $items = Item::all();
 
-         Purchase::factory(10000)->create()
-         ->each(function (Purchase $purchase) use ($items) {
-             $purchase->items()->attach(
-                 $items->random(rand(1, 3))->pluck('id')->toArray(),
-                 ['quantity' => rand(1, 5)] 
-             );
-         });
+        //  Purchase::factory(10000)->create()
+        //  ->each(function (Purchase $purchase) use ($items) {
+        //      $purchase->items()->attach(
+        //          $items->random(rand(1, 3))->pluck('id')->toArray(),
+        //          ['quantity' => rand(1, 5)] 
+        //      );
+        //  });
     }
 }

@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreStaffRequest;
 use App\Http\Requests\UpdateStaffRequest;
 use App\Models\Staff;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class StaffController extends Controller
 {
+ 
     /**
      * Display a listing of the resource.
      *

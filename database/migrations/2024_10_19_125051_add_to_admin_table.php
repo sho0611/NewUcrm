@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('staff', function (Blueprint $table) {
-            $table->unsignedBigInteger('staff_id')->primary(); 
-            $table->string('name');
-            $table->string('memo');
+        Schema::table('admin', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique()->comment('名称');
+            $table->string('password')->comment('パスワード');
             $table->timestamps();
         });
     }
@@ -28,6 +28,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('staff');
+        Schema::table('admin', function (Blueprint $table) {
+            //
+        });
     }
 };

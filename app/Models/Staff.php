@@ -9,7 +9,7 @@ class Staff extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'memo'];
+    protected $fillable = ['name', 'memo', 'password'];
 
     public function appointments()
     {

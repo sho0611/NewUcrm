@@ -34,19 +34,12 @@ class AppointmentController extends Controller
     public function createAppointment(StoreAppointmentRequest $request)
     {
 
-        //顧客名をidとして保存したい
-        $customerName = $request->customer_name;
-        $customer = Customer::where('name', $customerName)->first();
-
-        if (!$customer) {
-            return response()->json(['error' => '顧客が見つかりませんでした。'], 404);
-        }
 
         $appointments = new Appointment();
         
         $createAppointments = [
             'item_id' => $request->item_id,
-            'customer_id' => $customer->id,
+            'customer_id' => $request->customer_id,
             'staff_id' => $request->staff_id,
             'appointment_date' => $request->appointment_date,
             'appointment_time' => $request->appointment_time,
@@ -122,7 +115,21 @@ public function getAvailableTimes(Request $request)
         'availableTimes' => array_values($availableTimes),
         '$staffAvailability' => $staffAvailability
     ]); 
+
 }
+   //
+      /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+      public function view(Request $request) {
+        $appointments = Appointment::query()
+        ->select('*')
+        ->get();
+        return response()->json($appointments);
+
+      }
 
 
     //

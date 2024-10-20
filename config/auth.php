@@ -40,6 +40,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+    //追加
+    'admin' => [
+        'driver' => 'session',
+        'provider' => 'admins',
+    ],
+    //
     ],
 
     /*
@@ -60,6 +66,13 @@ return [
     */
 
     'providers' => [
+
+    //追加
+    'admins' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Admin::class,
+    ],
+    //
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
@@ -85,6 +98,7 @@ return [
     | they have less time to be guessed. You may change this as needed.
     |
     */
+
 
     'passwords' => [
         'users' => [

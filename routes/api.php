@@ -10,6 +10,9 @@ use App\Http\Controllers\AnalysisDesileController;
 use App\Http\Controllers\AnalysisRfmController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AdminLoginController;
+//use App\Http\Controllers\Auth\StaffController;
+
 
 
 /*
@@ -74,16 +77,60 @@ Route::prefix('purchases')->controller(PurchaseController::class)->group(functio
 
 //レビュー関連
 Route::prefix('reviews')->controller(ReviewController::class)->group(function()  {
-    //顧客側
+    //顧客側 //レビュー作成関係
     Route::get('/form', 'reviewForm')->name('reviewForm');
     Route::post('/create', 'createReview')->name('createReview');
-    
-    //店側
-    //レビューを見る
+   
+    //レビュー閲覧 //レビューを見る
     Route::get('/view', 'viewReviews')->name('viewReviews');
-    //Itemごとのレビューを見る
+    //itemごとのレビューを見る
     Route::get('/{reviews}/viewItem', 'viewItemReviews')->name('viewItemReviews');
 });
+
+
+
+//管理ログイン
+Route::post('/admin-login', [AdminLoginController::class, 'logIn'])->name('admin.login.store');
+//管理ログアウト
+Route::delete('/admin-login', [AdminLoginController::class, 'logOut'])->name('admin.login.destroy');
+
+
+//予約関係
+Route::prefix('app')->controller(AppointmentController::class)->group(function()  {
+    // 顧客側
+    // それぞれのidに紐ずくデータを取得しjson送信
+    Route::get('/form', 'AppointmentForm')->name('AppointmentForm');
+    // 予約フォーム作成
+    Route::get('/create', 'createAppointment')->name('createAppointment');
+    // 予約可能時間の表示
+    Route::get('available-times', 'getAvailableTimes')->name('getAvailableTimes');
+    
+    //http://127.0.0.1:8000/api/app/admin/view
+    // 管理者側
+    Route::middleware('auth:admin')->group(function () {
+        // 店側の予約検索
+        Route::get('view', 'view')->name('view');
+
+        Route::get('search/service', 'searchAppointmentService')->name('searchAppointmentService');
+        Route::get('search/date', 'searchAppointmentDay')->name('searchAppointmentDay');
+        Route::get('search', 'searchDayItem')->name('searchDayItem');
+    });
+});
+
+
+
+  
+
+
+    // Route::middleware('auth:api')->group(function () {
+    //     // スタッフダッシュボード
+    //     Route::get('staff/dashboard', [StaffController::class, 'dashboard'])->middleware('isStaff');
+    // });
+
+    // Route::post('staff/register', [StaffController::class, 'register'])->name('staff.register');
+    
+
+
 
 
 
