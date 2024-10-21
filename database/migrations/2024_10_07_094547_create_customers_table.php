@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('customers', function (Blueprint $table) {
-            $table->unsignedBigInteger('customer_id')->primary();
+            $table->id('customer_id');
             $table->string('name');
             $table->string('kana');
             $table->string('tel')->unique();

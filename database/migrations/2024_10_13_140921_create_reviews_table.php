@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             
-            $table->unsignedBigInteger('review_id')->primary();
+            $table->id('review_id');
             $table->foreignId('item_id')
             ->onUpdate('cascade')
             ->onDelete('cascade'); 

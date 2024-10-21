@@ -19,12 +19,12 @@ class DatabaseSeeder extends Seeder
     {
 
         $this->call([
-            AdminSeeder::class,
-            // ItemSeeder::class,
+            //AdminSeeder::class,
+             ItemSeeder::class,
             // StaffSeeder::class,
         ]);
 
-        //  \App\Models\Customer::factory(150)->create();
+         //\App\Models\Customer::factory(150)->create();
         //  \App\Models\Appointment::factory(500)->create();
        
         //  $items = Item::all();

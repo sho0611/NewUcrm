@@ -24,7 +24,7 @@ class StoreAppointmentRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'item_id' => 'required|array', 
         ];
     }
 }

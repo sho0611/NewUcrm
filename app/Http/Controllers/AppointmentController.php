@@ -25,37 +25,51 @@ class AppointmentController extends Controller
 
         return response()->json($appointments);
     }
-    
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function createAppointment(StoreAppointmentRequest $request)
     {
-        $appointments = new Appointment();
-        
-        $createAppointments = [
-            'item_id' => $request->item_id,
-            'customer_id' => $request->customer_id,
-            'staff_id' => $request->staff_id,
-            'appointment_date' => $request->appointment_date,
-            'appointment_time' => $request->appointment_time,
-        ];
-        
-        $appointments->fill($createAppointments);
-        $appointments->save();
+        $itemIds = $request->item_id; 
+        $customerId = $request->customer_id;
+        $staffId = $request->staff_id;
+        $appointmentDate = $request->appointment_date;
+        $appointmentTime = $request->appointment_time;
 
-        //顧客への通知を送信
-        //idから顧客の情報を取得
-        $customer = Customer::find($appointments->customer_id);
+        $appointments = []; 
+        // 複数のアポイントメントを保存する
+        foreach ($itemIds as $itemId) {
+            $appointment = new Appointment();
+            
+            $createAppointments = [
+                'item_id' => $itemId,
+                'customer_id' => $customerId,
+                'staff_id' => $staffId,
+                'appointment_date' => $appointmentDate,
+                'appointment_time' => $appointmentTime,
+            ];
+            
+            $appointment->fill($createAppointments);
+            $appointment->save(); 
+            $appointments[] = $appointment; 
+        }
 
-        //顧客への通知を送信
-        $customer->notify(new AppointmentCreated($appointments));
-    
+        // アイテムの名前を取得//findOrFailやり方
+        //$items = Item::query()->findOrFail('item_id', $itemIds)->get();
+        $items = Item::whereIn('item_id', $itemIds)->get();
+        $itemNames = $items->pluck('name')->implode(', '); 
+        
+        // 顧客への通知を一度だけ送信
+        //$customer = Customer::query()->findOrFail('customer_id', $customerId)->get();
+        $customer = Customer::where('customer_id', $customerId)->first();
+        if ($customer) {
+            $customer->notify(new AppointmentCreated($appointment, $itemNames));
+        }
+      
         return response()->json($appointments);
     }
+    
+    
+    
+    
 
 //http://127.0.0.1:8000/api/app/available-times?app_date=2024-10-20
 public function getAvailableTimes(Request $request)
