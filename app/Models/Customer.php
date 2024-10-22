@@ -30,6 +30,9 @@ class Customer extends Model
     }
 
 
+
+
+
     public function scopeCustomerItems($query)
     {
         return $query->select(

@@ -10,6 +10,9 @@ use App\Models\Purchase;
 use App\Models\Item;
 use Illuminate\Support\Facades\DB;
 use App\Models\ItemPurchase;
+use App\Models\Coupon;
+use App\Notifications\CouponNotification;
+use Carbon\Carbon; 
 
 
 
@@ -154,9 +157,23 @@ class CustomerController extends Controller
         $customer->fill($customerCreateArray);
         $customer->save();
 
-        //return response()->json($customer);
-        return redirect()->route('reviews.create', ['customer_id' => $customer->id]);
+        //クーポンを送信
+        $this->sendCouponToCoustomer($customer);
+
+
+        return response()->json($customer);
     }
+
+    protected function sendCouponToCoustomer(Customer $customer){
+    // 例: クーポンを通知
+    $coupon = Coupon::where('discount_value', '10')
+    ->where('expiration_date', '>', Carbon::now())
+    ->first();
+
+    if ($coupon) {
+        $customer->notify(new CouponNotification($coupon));
+    }
+}
 
         /**
      * Update the specified resource in storage.

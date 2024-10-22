@@ -11,6 +11,7 @@ use App\Http\Controllers\AnalysisRfmController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AdminLoginController;
+use App\Http\Controllers\CouponController;
 //use App\Http\Controllers\Auth\StaffController;
 
 
@@ -117,18 +118,17 @@ Route::prefix('app')->controller(AppointmentController::class)->group(function()
     });
 });
 
-
-
-  
-
-
-    // Route::middleware('auth:api')->group(function () {
-    //     // スタッフダッシュボード
-    //     Route::get('staff/dashboard', [StaffController::class, 'dashboard'])->middleware('isStaff');
-    // });
-
-    // Route::post('staff/register', [StaffController::class, 'register'])->name('staff.register');
+//クーポン関連
+Route::prefix('coupon')->controller(CouponController::class)->group(function () {
+    // 管理者側
+    Route::post('/create', 'createCoupon')->name('createCoupon');
+    Route::put('{coupon}', 'updateCoupon')->name('updateCoupon');
+    Route::delete('{coupon}', 'destroyCoupon')->name('destroyCoupon');
     
+    // 顧客側
+    Route::get('/view', 'viewCoupon')->name('viewCoupon');
+});
+
 
 
 
