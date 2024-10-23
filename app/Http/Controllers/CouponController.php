@@ -6,8 +6,11 @@ use App\Http\Requests\StorecouponRequest;
 use App\Http\Requests\UpdatecouponRequest;
 use App\Models\Appointment;
 use App\Models\Coupon;
+use App\Models\CouponUsage;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use App\Notifications\TopCouponNotification;
 
 
 
@@ -33,7 +36,6 @@ class CouponController extends Controller
         $item->save();
     
         return response()->json($couponCreateArray);
-        
     }
 
         /**
@@ -93,9 +95,32 @@ class CouponController extends Controller
         return response()->json($coupons);
     }
 
+
+    //これはどこに書くのが適切か  //テストコード
     public function sendCouponToTopCustomers()
     {
-        
-    }
+        $towMonthsago = now()->subMonth(2);
 
+        $topCustomers = Customer::query()
+        //直近2ヶ月の八百屋くを取得
+        ->where('appointment_date', '>=', $towMonthsago)
+        ->groupBy('customer_id')
+        //予約が2回以上の顧客を取得
+        ->havingRaw('count(*) >= 2')
+        ->pluck('customer_id');
+        
+        //送るクーポンを取得
+        $coupon = Coupon::where('discount_value', '50')
+        ->where('expiration_date', '>', Carbon::now()) 
+        ->first();
+
+        if ($coupon) {
+            $customers = Customer::whereIn('customer_id', $topCustomers)->get();
+            foreach ($customers as $customer)
+            {  
+                $customer->notify(new TopCouponNotification($coupon));
+                return response()->json(['message' => 'Coupon sent successfully!']);
+            }
+        }
+    }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Purchase;
 use App\Models\Review;
+use App\Models\Coupon;
 use Illuminate\Notifications\Notifiable;
 
 class Customer extends Model
@@ -29,9 +30,11 @@ class Customer extends Model
         return $this->hasMany(Appointment::class);
     }
 
-
-
-
+    public function coupons()
+    {
+        return $this->belongsToMany(Coupon::class)
+        ->withPivot('use_at');
+    }
 
     public function scopeCustomerItems($query)
     {

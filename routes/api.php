@@ -12,6 +12,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\CouponController;
+use App\Http\Controllers\CouponUsageController;
 //use App\Http\Controllers\Auth\StaffController;
 
 
@@ -121,12 +122,20 @@ Route::prefix('app')->controller(AppointmentController::class)->group(function()
 //クーポン関連
 Route::prefix('coupon')->controller(CouponController::class)->group(function () {
     // 管理者側
-    Route::post('/create', 'createCoupon')->name('createCoupon');
+    Route::get('/create', 'createCoupon')->name('createCoupon');
     Route::put('{coupon}', 'updateCoupon')->name('updateCoupon');
     Route::delete('{coupon}', 'destroyCoupon')->name('destroyCoupon');
     
     // 顧客側
     Route::get('/view', 'viewCoupon')->name('viewCoupon');
+});
+//クーポン利用、履歴
+Route::prefix('usecoupon')->controller(CouponUsageController::class)->group(function() {
+    //顧客側
+    Route::get('/use', 'useCoupon')->name('useCoupon');
+
+    //管理者側
+    Route::get('/view', 'viewUsages')->name('viewUsages');
 });
 
 
