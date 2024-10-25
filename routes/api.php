@@ -133,7 +133,6 @@ Route::prefix('coupon')->controller(CouponController::class)->group(function () 
 Route::prefix('usecoupon')->controller(CouponUsageController::class)->group(function() {
     //顧客側
     Route::get('/use', 'useCoupon')->name('useCoupon');
-
     //管理者側
     Route::get('/view', 'viewUsages')->name('viewUsages');
 });
