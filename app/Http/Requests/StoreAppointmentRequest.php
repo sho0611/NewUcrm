@@ -24,7 +24,10 @@ class StoreAppointmentRequest extends FormRequest
     public function rules()
     {
         return [
-            'item_id' => 'required|array', 
+            'item_id' => ['required', 'exists:items,item_id'],                   
+            'customer_id' => ['required', 'integer', 'exists:customers,customer_id'],                         
+            'appointment_date' => ['required', 'date', 'after_or_equal:today'],              
+            'appointment_time' => ['required', 'date_format:H:i']
         ];
     }
 }

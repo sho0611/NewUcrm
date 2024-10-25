@@ -24,7 +24,10 @@ class StoreReviewRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'item_id' => ['required', 'integer', 'exists:items,item_id'],    
+            'customer_name' => ['required', 'string', 'max:255'],       
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],          
+            'comment' => ['nullable', 'string', 'max:1000'],  
         ];
     }
 }

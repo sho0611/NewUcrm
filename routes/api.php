@@ -13,6 +13,9 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CouponUsageController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\CommentController;
 //use App\Http\Controllers\Auth\StaffController;
 
 
@@ -79,17 +82,17 @@ Route::prefix('purchases')->controller(PurchaseController::class)->group(functio
 
 //レビュー関連
 Route::prefix('reviews')->controller(ReviewController::class)->group(function()  {
-    //顧客側 //レビュー作成関係
-    Route::get('/form', 'reviewForm')->name('reviewForm');
-    Route::post('/create', 'createReview')->name('createReview');
-   
+    //顧客側 //レビュー作成
+    Route::get('/create', 'createReview')->name('createReview');
+    Route::put('/{reviews}', 'updateReviews')->name('updateReviews');
+    Route::delete('/{reviews}', 'deleteReviews')->name('deleteReviews');
+
     //レビュー閲覧 //レビューを見る
     Route::get('/view', 'viewReviews')->name('viewReviews');
     //itemごとのレビューを見る
-    Route::get('/{reviews}/viewItem', 'viewItemReviews')->name('viewItemReviews');
+    Route::get('/{reviews}', 'viewItemReviews')->name('viewItemReviews');
+    
 });
-
-
 
 //管理ログイン
 Route::post('/admin-login', [AdminLoginController::class, 'logIn'])->name('admin.login.store');
@@ -100,12 +103,13 @@ Route::delete('/admin-login', [AdminLoginController::class, 'logOut'])->name('ad
 //予約関係
 Route::prefix('app')->controller(AppointmentController::class)->group(function()  {
     // 顧客側
-    // それぞれのidに紐ずくデータを取得しjson送信
-    Route::get('/form', 'AppointmentForm')->name('AppointmentForm');
-    // 予約フォーム作成
     Route::get('/create', 'createAppointment')->name('createAppointment');
     // 予約可能時間の表示
     Route::get('available-times', 'getAvailableTimes')->name('getAvailableTimes');
+    //予約の変更
+    Route::put('/{reviews}', 'changAppointment')->name('changAppointment');
+    //予約の削除
+    Route::delete('/{reviews}', 'deleteAppointment')->name('deleteAppointment');
     
     //http://127.0.0.1:8000/api/app/admin/view
     // 管理者側
@@ -113,7 +117,7 @@ Route::prefix('app')->controller(AppointmentController::class)->group(function()
         // 店側の予約検索
         Route::get('view', 'view')->name('view');
 
-        Route::get('search/service', 'searchAppointmentService')->name('searchAppointmentService');
+        Route::get('search/item', 'searchAppointmentItem')->name('searchAppointmentItem');
         Route::get('search/date', 'searchAppointmentDay')->name('searchAppointmentDay');
         Route::get('search', 'searchDayItem')->name('searchDayItem');
     });
@@ -136,6 +140,35 @@ Route::prefix('usecoupon')->controller(CouponUsageController::class)->group(func
     //管理者側
     Route::get('/view', 'viewUsages')->name('viewUsages');
 });
+
+//SNS //投稿
+Route::prefix('sns')->controller(PostController::class)->group(function() {
+    //管理者側
+    Route::post('/post', 'post')->name('post');
+
+    //ユーザー側
+    Route::post('{sns}', 'updatePost')->name('postUpdate');
+    Route::delete('{sns}', 'deletePost')->name('postDestroy'); 
+    // Route::get('/view', 'viewPosts')->name('viewPosts');
+    // Route::get('/{sns}', 'likeCount')->name('likeCount');
+    // Route::get('/{sns}', 'viewComment')->name('viewComment');
+    // Route::get('/{sns}', 'viewItemPost')->name('viewItemPost');
+});
+
+//SNS //いいね
+Route::prefix('likes')->controller(LikeController::class)->group(function() {
+    //顧客側
+    Route::post('/post', 'postLike')->name('postLike');
+    Route::delete('/{likes}', 'deleteLike')->name('deleteLike');
+});
+//SNS //コメント
+Route::prefix('com')->controller(CommentController::class)->group(function() {
+    Route::post('/post', 'postComment')->name('postComment');
+    Route::put('/{comments}', 'updateComment')->name('updateComment');
+    Route::delete('/{comments}', 'deleteComment')->name('deleteComment');
+});
+
+
 
 
 

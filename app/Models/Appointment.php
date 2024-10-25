@@ -13,6 +13,10 @@ use App\Models\Customer;
 class Appointment extends Model
 {
     use HasFactory;
+    protected $table = 'appointments'; 
+    protected $primaryKey = 'appointment_id'; 
+    protected $keyType = 'int'; 
+
 
     protected $fillable = [
         'item_id' ,

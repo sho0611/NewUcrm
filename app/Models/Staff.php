@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Appointment;
+
+
 
 class Staff extends Model
 {
@@ -15,4 +18,6 @@ class Staff extends Model
     {
         return $this->hasMany(Appointment::class);
     }
+
 }
+

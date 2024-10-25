@@ -11,18 +11,7 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-      /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function reviewForm(Request $request)
-    {
-        //アイテムの情報を渡す
-        $reviews = Review::with(['item'])->get();
-        return response()->json($reviews);
-    }
-
+ 
        /**
      * Store a newly created resource in storage.
      *
@@ -56,12 +45,21 @@ class ReviewController extends Controller
      */
     public function viewReviews()
     {
-        $reviews = Review::with(['item'])
-        ->get();
-
+        $reviews = Review::query()
+            ->join('items', 'reviews.item_id', '=', 'items.item_id')
+            ->select(
+                'items.item_id AS item_id',
+                'items.name AS item_name',
+                'items.price AS item_price',
+                'reviews.customer_name',
+                'reviews.rating',
+                'reviews.comment',
+                'reviews.created_at'
+            )
+            ->get();
         return response()->json($reviews);
     }
-
+    
     /**
      * Show the form for creating a new resource.
      *
@@ -69,10 +67,51 @@ class ReviewController extends Controller
      */
     public function viewItemReviews(int $itemId, Request $request)
     {
-        $reviews = Review::with(['item'])
+        $reviews = Review::query()
         ->where('item_id', $itemId)
         ->get();
-
         return response()->json($reviews);
     }
+
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\UpdateReviewRequest  $request
+     * @param  \App\Models\Review  $review
+     * @return \Illuminate\Http\Response
+     */
+    public function updateReviews(int $reviewId, UpdateReviewRequest $request)
+    {
+        $reviews = Review::query()->findOrFail($reviewId);
+        $reviewCreateArray = [
+            'item_id'=> $request->item_id,
+            'customer_name' => $request->customer_name,
+            'rating' => $request->rating,
+            'comment' => $request->comment
+        ];
+
+        $reviews->fill($reviewCreateArray);
+        $reviews->save();
+        return response()->json($reviews);
+    }
+
+        /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Review  $review
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteReviews($reviewId)
+    {
+        $review = Review::query()->findOrFail($reviewId);
+        if ($review) {
+            $review->delete();  
+            return response()->json(['message' => 'Deleted successfully']);
+        } else {
+            return response()->json(['message' => 'Record not found']);
+        }
+    }
 }
+
+   

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Purchase;
 use App\Models\Review;
 use App\Models\Coupon;
+use App\Models\Like;
 use Illuminate\Notifications\Notifiable;
 
 class Customer extends Model
@@ -27,13 +28,23 @@ class Customer extends Model
 
     public function appintments()
     {
-        return $this->hasMany(Appointment::class);
+        return $this->c(Appointment::class);
     }
 
     public function coupons()
     {
         return $this->belongsToMany(Coupon::class)
         ->withPivot('use_at');
+    }
+
+    public function like()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 
     public function scopeCustomerItems($query)
