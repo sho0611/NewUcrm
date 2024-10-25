@@ -13,6 +13,9 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CouponUsageController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\CommentController;
 //use App\Http\Controllers\Auth\StaffController;
 
 
@@ -137,6 +140,35 @@ Route::prefix('usecoupon')->controller(CouponUsageController::class)->group(func
     //管理者側
     Route::get('/view', 'viewUsages')->name('viewUsages');
 });
+
+//SNS //投稿
+Route::prefix('sns')->controller(PostController::class)->group(function() {
+    //管理者側
+    Route::post('/post', 'post')->name('post');
+
+    //ユーザー側
+    Route::post('{sns}', 'updatePost')->name('postUpdate');
+    Route::delete('{sns}', 'deletePost')->name('postDestroy'); 
+    // Route::get('/view', 'viewPosts')->name('viewPosts');
+    // Route::get('likes/{sns}', 'likeCount')->name('likeCount');
+    // Route::get('comment/{sns}', 'viewComment')->name('viewComment');
+    // Route::get('item/{sns}', 'viewItemPost')->name('viewItemPost');
+});
+
+//SNS //いいね
+Route::prefix('likes')->controller(LikeController::class)->group(function() {
+    //顧客側
+    Route::post('/post', 'postLike')->name('postLike');
+    Route::delete('/{likes}', 'deleteLike')->name('deleteLike');
+});
+//SNS //コメント
+Route::prefix('com')->controller(CommentController::class)->group(function() {
+    Route::post('/post', 'postComment')->name('postComment');
+    Route::put('/{comments}', 'updateComment')->name('updateComment');
+    Route::delete('/{comments}', 'deleteComment')->name('deleteComment');
+});
+
+
 
 
 
