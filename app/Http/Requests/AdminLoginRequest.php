@@ -30,7 +30,6 @@ class AdminLoginRequest extends FormRequest
             'password' => 'required',
         ];
     }
-
   //失敗時に例外をスローすることで、エラーハンドリング
     public function authenticate(): void
     {

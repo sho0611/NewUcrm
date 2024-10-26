@@ -119,7 +119,6 @@ Route::prefix('app')->controller(AppointmentController::class)->group(function()
 
         Route::get('search/item', 'searchAppointmentItem')->name('searchAppointmentItem');
         Route::get('search/date', 'searchAppointmentDay')->name('searchAppointmentDay');
-        Route::get('search', 'searchDayItem')->name('searchDayItem');
     });
 });
 

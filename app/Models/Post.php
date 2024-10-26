@@ -12,7 +12,6 @@ class Post extends Model
     use HasFactory;
     protected $table = 'posts'; 
     protected $primaryKey = 'post_id'; 
-    protected $keyType = 'int'; 
 
     protected $fillable = ['staff_id', 'item_id', 'description', 'image'];
 
