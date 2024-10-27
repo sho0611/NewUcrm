@@ -17,7 +17,7 @@ class SaveAppointment
         $this->sendNotificationItemNames = $sendNotificationItemNames;
     }
     
-    public function createAppointments(AppointmentData $appointmentData): AppointmentResult
+    public function saveAppointments(AppointmentData $appointmentData): AppointmentResult
     {
         $appointments = [];
 

@@ -9,7 +9,6 @@ use App\Models\Item;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Staff;
-use App\Notifications\AppointmentCreated;
 use App\Data\AppointmentData;
 use App\Services\SaveAppointment;
 
@@ -23,11 +22,13 @@ class AppointmentController extends Controller
      * @param StoreAppointmentRequest $request
      * @return void
      */
-    protected SaveAppointment $saveAppointmentController;
+    //インスタンス化するクラス/インスタンス名
+    protected $saveAppointment;
 
-    public function __construct(SaveAppointment $saveAppointmentController)
+    //SaveAppointmentのインスタンを注入
+    public function __construct(SaveAppointment $saveAppointment)
     {
-        $this->saveAppointmentController = $saveAppointmentController;
+        $this->saveAppointment = $saveAppointment;
     }
 
     public function createAppointment(StoreAppointmentRequest $request)
@@ -40,7 +41,7 @@ class AppointmentController extends Controller
             appointmentTime: $request->appointment_time
         );
 
-        $appointmentResult = $this->saveAppointmentController->createAppointments($appointmentData);
+        $appointmentResult = $this->saveAppointment->saveAppointments($appointmentData);
 
         return response()->json($appointmentResult->appointments);
     }
