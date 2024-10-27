@@ -11,8 +11,6 @@ use App\Models\Customer;
 use App\Models\Staff;
 use App\Notifications\AppointmentCreated;
 
-use App\Services\SaveAppointmentController;
-
 class AppointmentController extends Controller
 {
     /**
@@ -21,27 +19,45 @@ class AppointmentController extends Controller
      * @param StoreAppointmentRequest $request
      * @return void
      */
-  
-        protected $saveAppointmentController;
+    public function createAppointment(StoreAppointmentRequest $request)
+    {
+        $itemIds = $request->item_id; 
+        $customerId = $request->customer_id;
+        $staffId = $request->staff_id;
+        $appointmentDate = $request->appointment_date;
+        $appointmentTime = $request->appointment_time;
 
-        public function __construct(SaveAppointmentController $saveAppointmentController)
-        {
-            $this->saveAppointmentController = $saveAppointmentController;
+        $appointments = []; 
+        // 複数のアポイントメントを保存する
+        foreach ($itemIds as $itemId) {
+            $appointment = new Appointment();
+            
+            $createAppointments = [
+                'item_id' => $itemId,
+                'customer_id' => $customerId,
+                'staff_id' => $staffId,
+                'appointment_date' => $appointmentDate,
+                'appointment_time' => $appointmentTime,
+            ];
+            
+            $appointment->fill($createAppointments);
+            $appointment->save(); 
+            $appointments[] = $appointment; 
         }
 
-        public function createAppointment(StoreAppointmentRequest $request)
-        {
-            $appointments = $this->saveAppointmentController->createAppointments(
-                $request->item_id,
-                $request->customer_id,
-                $request->staff_id,
-                $request->appointment_date,
-                $request->appointment_time
-            );
+        //$items = Item::query()->findOrFail('item_id', $itemIds)->get();
+        $items = Item::whereIn('item_id', $itemIds)->get();
+        $itemNames = $items->pluck('name')->implode(', '); 
+        
+        // 顧客への通知を一度だけ送信
+        //$customer = Customer::query()->findOrFail('customer_id', $customerId)->get();
+        $customer = Customer::where('customer_id', $customerId)->first();
+        if ($customer) {
+            $customer->notify(new AppointmentCreated($appointment, $itemNames));
+        }
     
-            return response()->json($appointments);
-        }
-
+        return response()->json($appointments);
+    }
 
             //
         /**

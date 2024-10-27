@@ -6,6 +6,8 @@ use App\Models\Item;
 use App\Models\Customer;
 use App\Notifications\AppointmentCreated;
 
+
+
 class SendNotificationItemNames
 {
     public function sendNotificationItemNames(array $appointments, int $customerId, array $itemIds)

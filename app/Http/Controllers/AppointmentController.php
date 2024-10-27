@@ -10,6 +10,10 @@ use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Staff;
 use App\Notifications\AppointmentCreated;
+use App\Data\AppointmentData;
+use App\Services\SaveAppointment;
+
+
 
 class AppointmentController extends Controller
 {
@@ -19,47 +23,29 @@ class AppointmentController extends Controller
      * @param StoreAppointmentRequest $request
      * @return void
      */
-    public function createAppointment(StoreAppointmentRequest $request)
+    protected SaveAppointment $saveAppointmentController;
+
+    public function __construct(SaveAppointment $saveAppointmentController)
     {
-        $itemIds = $request->item_id; 
-        $customerId = $request->customer_id;
-        $staffId = $request->staff_id;
-        $appointmentDate = $request->appointment_date;
-        $appointmentTime = $request->appointment_time;
-
-        $appointments = []; 
-        // 複数のアポイントメントを保存する
-        foreach ($itemIds as $itemId) {
-            $appointment = new Appointment();
-            
-            $createAppointments = [
-                'item_id' => $itemId,
-                'customer_id' => $customerId,
-                'staff_id' => $staffId,
-                'appointment_date' => $appointmentDate,
-                'appointment_time' => $appointmentTime,
-            ];
-            
-            $appointment->fill($createAppointments);
-            $appointment->save(); 
-            $appointments[] = $appointment; 
-        }
-
-        //$items = Item::query()->findOrFail('item_id', $itemIds)->get();
-        $items = Item::whereIn('item_id', $itemIds)->get();
-        $itemNames = $items->pluck('name')->implode(', '); 
-        
-        // 顧客への通知を一度だけ送信
-        //$customer = Customer::query()->findOrFail('customer_id', $customerId)->get();
-        $customer = Customer::where('customer_id', $customerId)->first();
-        if ($customer) {
-            $customer->notify(new AppointmentCreated($appointment, $itemNames));
-        }
-    
-        return response()->json($appointments);
+        $this->saveAppointmentController = $saveAppointmentController;
     }
 
-            //
+    public function createAppointment(StoreAppointmentRequest $request)
+    {
+        $appointmentData = new AppointmentData(
+            itemIds: $request->item_id,
+            customerId: $request->customer_id,
+            staffId: $request->staff_id,
+            appointmentDate: $request->appointment_date,
+            appointmentTime: $request->appointment_time
+        );
+
+        $appointmentResult = $this->saveAppointmentController->createAppointments($appointmentData);
+
+        return response()->json($appointmentResult->appointments);
+    }
+
+      //
         /**
          * Display a listing of the resource.
          *
