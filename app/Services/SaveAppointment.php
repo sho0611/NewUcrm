@@ -1,22 +1,36 @@
 <?php
 
 namespace App\Services;
-use App\Models\Item;
-use App\Models\Customer;
 use App\Services\sendNotificationItemNames;
 use App\Models\Appointment;
 use App\Data\AppointmentData;
 use App\Data\AppointmentResult;
 
-class SaveAppointment
+//必ずsaveAppointmentsという名前で、AppointmentDataをAppointmentResultとして返す
+interface AppointmentSaverInterface
+{
+    public function saveAppointments(AppointmentData $appointmentData): AppointmentResult;
+}
+
+class SaveAppointment implements AppointmentSaverInterface
 {
     protected $sendNotificationItemNames;
-
+    /**
+     * SaveAppointment constructor
+     *
+     * @param SendNotificationItemNames $sendNotificationItemNames
+     */
     public function __construct(SendNotificationItemNames $sendNotificationItemNames)
     {
         $this->sendNotificationItemNames = $sendNotificationItemNames;
     }
-    
+
+    /**
+     * 予約を保存
+     *
+     * @param AppointmentData $appointmentData
+     * @return AppointmentResult
+     */
     public function saveAppointments(AppointmentData $appointmentData): AppointmentResult
     {
         $appointments = [];
@@ -37,11 +51,13 @@ class SaveAppointment
             $appointments[] = $appointment;
         }
 
+        // 通知を送信
         $this->sendNotificationItemNames->sendNotificationItemNames($appointments, $appointmentData->customerId, $appointmentData->itemIds);
 
         return new AppointmentResult($appointments);
     }
 }
+
 
 
 

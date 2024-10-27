@@ -11,26 +11,24 @@ use App\Models\Customer;
 use App\Models\Staff;
 use App\Data\AppointmentData;
 use App\Services\SaveAppointment;
-
+use App\Services\SendNotificationItemNames;
 
 
 class AppointmentController extends Controller
 {
-    /**
-     * Undocumented function
-     *
-     * @param StoreAppointmentRequest $request
-     * @return void
-     */
-    //インスタンス化するクラス/インスタンス名
-    protected $saveAppointment;
 
-    //SaveAppointmentのインスタンを注入
+    protected $saveAppointment;
+    
     public function __construct(SaveAppointment $saveAppointment)
     {
         $this->saveAppointment = $saveAppointment;
     }
-
+     /**
+     * 予約の作成
+     *
+     * @param StoreAppointmentRequest $request
+     * @return void
+     */
     public function createAppointment(StoreAppointmentRequest $request)
     {
         $appointmentData = new AppointmentData(
@@ -40,7 +38,8 @@ class AppointmentController extends Controller
             appointmentDate: $request->appointment_date,
             appointmentTime: $request->appointment_time
         );
-
+                //インスタンスを通じてsaveAppointmentsメソッドを呼び出しデータを渡す
+                //saveAppointments メソッドにデータを渡し、その結果を受け取る処理
         $appointmentResult = $this->saveAppointment->saveAppointments($appointmentData);
 
         return response()->json($appointmentResult->appointments);
