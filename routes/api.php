@@ -96,9 +96,6 @@ Route::prefix('reviews')->controller(ReviewController::class)->group(function() 
 
 //管理ログイン
 Route::post('/admin-login', [AdminLoginController::class, 'logIn'])->name('admin.login.store');
-//管理ログアウト
-Route::delete('/admin-login', [AdminLoginController::class, 'logOut'])->name('admin.login.destroy');
-
 
 //予約関係
 Route::prefix('app')->controller(AppointmentController::class)->group(function()  {
@@ -113,13 +110,15 @@ Route::prefix('app')->controller(AppointmentController::class)->group(function()
     
     //http://127.0.0.1:8000/api/app/admin/view
     // 管理者側
-    Route::middleware('auth:admin')->group(function () {
+    // Route::middleware('auth:sanctum')->group(function () {
         // 店側の予約検索
         Route::get('view', 'view')->name('view');
 
         Route::get('search/item', 'searchAppointmentItem')->name('searchAppointmentItem');
-        Route::get('search/date', 'searchAppointmentDay')->name('searchAppointmentDay');
-    });
+        Route::get('search/date', 'searchAppointmentsByDateWithItems')->name('AppointmentsByDateWithItems');
+        //管理ログアウト
+        // Route::delete('/admin-login', [AdminLoginController::class, 'logOut'])->name('admin.login.destroy');
+    // });
 });
 
 //クーポン関連

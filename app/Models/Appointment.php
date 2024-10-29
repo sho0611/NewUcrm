@@ -14,8 +14,7 @@ class Appointment extends Model
 {
     use HasFactory;
     protected $table = 'appointments'; 
-    protected $primaryKey = 'appointment_id'; 
-    protected $keyType = 'int'; 
+    protected $primaryKey = 'appointment_id';
 
 
     protected $fillable = [

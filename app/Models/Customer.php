@@ -13,6 +13,10 @@ use Illuminate\Notifications\Notifiable;
 class Customer extends Model
 {
     use HasFactory, Notifiable;
+    const Man = 0;
+    const Woman = 1;
+    const Other = 2;
+
 
     protected $fillable = ['name','kana','email','tel','postcode','address','birthday','gender','memo'];
 

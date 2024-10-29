@@ -11,6 +11,8 @@ use App\Models\Staff;
 use App\Data\AppointmentData;
 use App\Services\AppointmentSaverInterface;
 use Illuminate\Support\Facades\Log;
+use App\Services\CreateTimeArray;
+use App\Services\GetReservedTimeArray;
 
 
 
@@ -18,10 +20,14 @@ class AppointmentController extends Controller
 {
 
     protected $appointmentSaver;
+    protected $getReservedTimeArray;
+    protected $createTimeArray;
     
-    public function __construct(AppointmentSaverInterface $appointmentSaver)
+    public function __construct(AppointmentSaverInterface $appointmentSaver, GetReservedTimeArray $getReservedTimeArray,CreateTimeArray $createTimeArray)
     {
         $this->appointmentSaver = $appointmentSaver; 
+        $this->getReservedTimeArray = $getReservedTimeArray;
+        $this->createTimeArray = $createTimeArray; 
     }
      /**
      * 予約の作成
@@ -38,76 +44,31 @@ class AppointmentController extends Controller
             appointmentDate: $request->appointment_date,
             appointmentTime: $request->appointment_time
         );
-                //インスタンスを通じてsaveAppointmentsメソッドを呼び出しデータを渡す
-                //saveAppointments メソッドにデータを渡し、その結果を受け取る処理
         $appointmentResult = $this->appointmentSaver->saveAppointments($appointmentData);
 
         return response()->json($appointmentResult->appointments);
     }
 
-      //
-        /**
-         * Display a listing of the resource.
-         *
-         * @return \Illuminate\Http\Response
-         */
-    //http://127.0.0.1:8000/api/app/available-times?app_date=2024-10-20
+    /**
+     * 予約可能な時間を表示
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function getAvailableTimes(Request $request)
     {
-        //予約日の取得
-        $appointDate = $request->query('date');
+    
+    //time取得 getTime
+    $appointDate = $request->query('date');
+    $times = $this->createTimeArray->createTimeArray();
+    $reservedTimes = $this->getReservedTimeArray->getReservedTime( $appointDate);
 
-        // 営業時間の設定
-        $startTime = new \DateTime('09:00');
-        $endTime = new \DateTime('18:00');
-
-        // '09:00'から'18:00'までの15分間隔の時間の作成
-        $interval = new \DateInterval('PT15M');
-        $times = [];
-        while ($startTime < $endTime) 
-        {
-            $times[] = $startTime->format('H:i'); // 修正
-            $startTime->add($interval);
-        }
-
-         // 予約日を取得
-         $appointments = Appointment::with('item')
-         ->where('appointment_date', $appointDate)
-         ->get();
-        //return response()->json($appointments);
+    $availableTimes = array_diff($times, $reservedTimes);
 
 
-        // 各予約時間を配列でリストアップ
-        $reservedTimes = [];
-        foreach ($appointments as $appointment) 
-        {
-            // 12:30:00 
-            $appointmentStartTime = new \DateTime($appointment->appointment_time); // 修正
-            // 90
-            $itemDuration = $appointment->item->duration;
-            // 12:30:00
-            $appointmentEndTime = clone $appointmentStartTime;
-            // 12:30:00<-90 //$appointmentEndTime = 14:00:00
-            $appointmentEndTime->add(new \DateInterval("PT{$itemDuration}M"));
+    // return response()->json(array_values($availableTimes));
 
-                // 12:30:00           //14:00:00
-            while ($appointmentStartTime < $appointmentEndTime)
-            {
-                // [12:30]
-                $reservedTimes[] = $appointmentStartTime->format('H:i');
-                // [12:30<-add(15),12:45<-add(15)...]
-                $appointmentStartTime->add($interval);
-            }
-        }
-        // $reservedTimes = array_unique($reservedTimes);
-        // $reservedTimes = array_values($reservedTimes);
-
-         $availableTimes = array_diff($times, $reservedTimes);        
-        //return response()->json(array_values($availableTimes));
-        return response()->json($availableTimes);
-
-
- 
+    //setAvailableStaff
+    $staffAvailability = [];
             foreach ($availableTimes as $time) {
                 $staffAvailability[$time] = Staff::whereNotIn('staff_id', function ($query) use ($appointDate, $time) {
                     $query->select('staff_id')
@@ -126,34 +87,35 @@ class AppointmentController extends Controller
         ]); 
     }
 
+ 
+    
+    /**
+     * 予約の変更
+     *
+     * @param integer $appId
+     * @param UpdateAppointmentRequest $request
+     * @return void
+     */
     public function changAppointment(int $appId, UpdateAppointmentRequest $request)
     {
-        $itemIds = $request->item_id; 
-        $customerId = $request->customer_id;
-        $staffId = $request->staff_id;
-        $appointmentDate = $request->appointment_date;
-        $appointmentTime = $request->appointment_time;
+        $appointmentData = new AppointmentData(
+            itemIds: $request->item_id,
+            customerId: $request->customer_id,
+            staffId: $request->staff_id,
+            appointmentDate: $request->appointment_date,
+            appointmentTime: $request->appointment_time
+        );
+        $appointmentResult = $this->appointmentSaver->saveAppointments($appointmentData);
 
-        $appointments = []; 
-        // 複数のアポイントメントを保存する
-        foreach ($itemIds as $itemId) {
-            $appointment = Appointment::query()->findOrFail($appId);
-            
-            $createAppointments = [
-                'item_id' => $itemId,
-                'customer_id' => $customerId,
-                'staff_id' => $staffId,
-                'appointment_date' => $appointmentDate,
-                'appointment_time' => $appointmentTime,
-            ];
-            
-            $appointment->fill($createAppointments);
-            $appointment->save(); 
-            $appointments[] = $appointment; 
-        }
-        return response()->json($appointments);
+        return response()->json($appointmentResult->appointments);
     }
 
+    /**
+     * 予約の削除
+     *
+     * @param $appId
+     * @return void
+     */
     public function deleteAppointment($appId)
     {
         $appointment = Appointment::query()->findOrFail($appId);
@@ -166,7 +128,7 @@ class AppointmentController extends Controller
     }
     //
       /**
-     * Display a listing of the resource.
+     * 全ての予約を表示
      *
      * @return \Illuminate\Http\Response
      */
@@ -177,49 +139,81 @@ class AppointmentController extends Controller
         return response()->json($appointments);
       }
 
-    //
-      /**
-     * Display a listing of the resource.
+    /**
+     * 予約Itemの検索
      *
      * @return \Illuminate\Http\Response
      */
-    //http://127.0.0.1:8000/api/app/search/item?item_name=カット
+    //http://127.0.0.1:8000/api/app/search/item?name=カット
     public function searchAppointmentItem(Request $request)
     {
         $itemName = $request->query('name');
-        $items = Item::where('name', $itemName)->get();
-        $itemIds = $items->pluck('item_id');
+        $itemIds = $this->getItemIds($itemName);
+        $filteredAppointments = $this->getAppointmentsByItemIds($itemIds);
 
-        $appointments = Appointment::query()
-        ->whereIn('item_id', $itemIds)
-        ->get()->toArray();
-        
-        return response()->json($appointments);
+
+        return response()->json($filteredAppointments);
     }
 
-        /**
-     * Display a listing of the resource.
+    /**
+     *予約日の検索
      *
      * @return \Illuminate\Http\Response
      */
-    //http://127.0.0.1:8000/api/app/search/date?appoint_date=1983-10-26
-    public function searchAppointmentDay(Request $request)
+    //http://127.0.0.1:8000/api/app/search/date?date=1983-10-26
+    public function searchAppointmentsByDateWithItems(Request $request)
     {
         $appointmentDate = $request->query('date');
 
+        $appointments = $this->getAppointmentsDay($appointmentDate);
+
+        $itemIds = $appointments->pluck('item_id');
+        $filteredAppointments = $this->getAppointmentsByItemIds($itemIds);
+
+        $filteredAppointments['items'] = $itemIds->toArray();
+
+        return response()->json($filteredAppointments);
+    }
+
+    /**
+ * 検索された日付の予約を取得
+ *
+ * @param string $appointmentDate
+ * @return \Illuminate\Support\Collection
+ */
+    private function getAppointmentsDay($appointmentDate)
+    {
         $appointments = Appointment::query()
         ->where('appointment_date', $appointmentDate)
         ->get();
         
-        $itemIds = $appointments->pluck('item_id');
-
-        $appointmentsItem = Item::query('item')
-        ->whereIn('item_id', $itemIds)
-        ->get();
-
-        $appointmentArray = $appointments->toArray();
-        $appointmentArray['items'] = $appointmentsItem->toArray();
-
-        return response()->json($appointmentArray);
+        return $appointments;
     }
+     /**
+     * 検索されたアイテムのIDを取得
+     *
+     * @param  $itemName
+     * @return $itemIds
+     */
+    private function getItemIds($itemName)
+    {
+        $items = Item::where('name', $itemName)->get();
+        $itemIds = $items->pluck('item_id');
+        return $itemIds;
+    }
+    /**
+     * 検索されたアイテムを含む予約を取得
+     *
+     * @param $itemIds
+     * @return $appointments
+     */
+    private function getAppointmentsByItemIds($itemIds)
+    {
+        $appointments = Appointment::query()
+        ->whereIn('item_id', $itemIds)
+        ->get()
+        ->toArray();
+        return $appointments;
+    }
+   
 }

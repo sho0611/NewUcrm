@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Services;
-use App\Services\sendNotificationItemNames;
+
 use App\Models\Appointment;
 use App\Data\AppointmentData;
 use App\Data\AppointmentResult;
+use App\Services\sendNotificationItemNames;
 
-//必ずsaveAppointmentsという名前で、AppointmentDataをAppointmentResultとして返す
 interface AppointmentSaverInterface
 {
     public function saveAppointments(AppointmentData $appointmentData): AppointmentResult;
@@ -22,9 +22,9 @@ class SaveAppointment implements AppointmentSaverInterface
      */
     public function __construct(SendNotificationItemNames $sendNotificationItemNames)
     {
+       
         $this->sendNotificationItemNames = $sendNotificationItemNames;
     }
-
     /**
      * 予約を保存
      *
@@ -52,10 +52,8 @@ class SaveAppointment implements AppointmentSaverInterface
             } else {
                 $previousAppointment = $appointments[$index - 1];
                 $previousDuration = $previousAppointment->item->duration; 
-    
-                
                 $newAppointmentTime = new \DateTime($appointmentData->appointmentTime);
-                $newAppointmentTime->add(new \DateInterval("PT{$previousDuration}M")); // 前のdurationを加算
+                $newAppointmentTime->add(new \DateInterval("PT{$previousDuration}M")); 
                 $createAppointments['appointment_time'] = $newAppointmentTime->format('H:i');
             }
     
@@ -63,8 +61,7 @@ class SaveAppointment implements AppointmentSaverInterface
             $appointment->save();
             $appointments[] = $appointment;
         }
-    
-        // 通知を送信（最初の予約時間を使用）
+
         $this->sendNotificationItemNames->sendNotificationItemNames($appointments, $appointmentData->customerId, $appointmentData->itemIds, $firstAppointmentTime);
     
         return new AppointmentResult($appointments);
