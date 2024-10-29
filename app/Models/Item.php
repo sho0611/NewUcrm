@@ -10,6 +10,8 @@ use App\Models\Review;
 class Item extends Model
 {
     use HasFactory;
+    protected $table = 'items';
+    protected $primaryKey = 'item_id';
 
     protected $fillable = ['name', 'memo', 'price', 'is_selling'];
 

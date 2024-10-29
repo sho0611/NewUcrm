@@ -11,6 +11,8 @@ use App\Models\Appointment;
 class Staff extends Model
 {
     use HasFactory;
+    protected $table = 'staff';
+    protected $primaryKey = 'staff_id';
 
     protected $fillable = ['name', 'memo', 'password'];
 

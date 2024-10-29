@@ -12,6 +12,7 @@ class AppointmentCreated extends Notification
 
     protected $appointment;
     protected $itemNames;
+    protected $firstAppointmentTime;
     /**
      * Create a new notification instance.
      *
@@ -19,10 +20,11 @@ class AppointmentCreated extends Notification
      * @param string $itemNames
      * @return void
      */
-    public function __construct($appointment, $itemNames)
+    public function __construct($appointment, $itemNames, $firstAppointmentTime)
     {
         $this->appointment = $appointment;
         $this->itemNames = $itemNames;
+        $this->firstAppointmentTime = $firstAppointmentTime;
     }
 
     /**
@@ -48,7 +50,7 @@ class AppointmentCreated extends Notification
             ->subject('予約管理')
             ->line('あなたの予約が完了しました。')
             ->line('予約日: ' . $this->appointment->appointment_date)
-            ->line('予約時間: ' . $this->appointment->appointment_time)
+            ->line('予約時間: ' . $this->firstAppointmentTime)
             ->line('予約アイテム: ' . $this->itemNames)
             ->line('ありがとうございます！');
     }

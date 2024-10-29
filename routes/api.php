@@ -105,7 +105,7 @@ Route::prefix('app')->controller(AppointmentController::class)->group(function()
     // 顧客側
     Route::get('/create', 'createAppointment')->name('createAppointment');
     // 予約可能時間の表示
-    Route::get('available-times', 'getAvailableTimes')->name('getAvailableTimes');
+    Route::get('times', 'getAvailableTimes')->name('getAvailableTimes');
     //予約の変更
     Route::put('/{reviews}', 'changAppointment')->name('changAppointment');
     //予約の削除
