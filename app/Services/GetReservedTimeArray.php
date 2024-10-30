@@ -29,8 +29,8 @@ class GetReservedTimeArray
             $reservedTimes[] = $roundedTime->format('H:i');
             $appointmentStartTime->add($interval);
         }
-    
     }
+    
     $reservedTimes = array_unique($reservedTimes);
     $reservedTimes = array_values($reservedTimes);
     return $reservedTimes;

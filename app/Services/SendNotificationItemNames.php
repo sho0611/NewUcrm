@@ -5,12 +5,7 @@ use App\Models\Appointment;
 use App\Models\Item;
 use App\Models\Customer;
 use App\Notifications\AppointmentCreated;
-
-//必ずsendNotificationItemNamesという名前で、array $appointments, int $customerId, array $itemIdsを返す
-interface SendNotificationItemNamesInterface
-{
-    public function sendNotificationItemNames(array $appointments, int $customerId, array $itemIds, string $firstAppointmentTime);
-}
+use App\Interfaces\SendNotificationItemNamesInterface;
 
 class SendNotificationItemNames implements SendNotificationItemNamesInterface
 {

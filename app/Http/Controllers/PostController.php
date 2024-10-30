@@ -3,18 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Services\SavePost;
 use Illuminate\Http\Request;
+use App\Data\PostData;
 
 class PostController extends Controller
 {
- 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-   
+    private $savePost;
+    public function __construct(SavePost $savePost)
+    {
+        $this->savePost = $savePost;
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -28,42 +27,18 @@ class PostController extends Controller
         } else {
             return response()->json(['error' => 'No file uploaded']);
         }
-        $post = new Post();
-        $postCreatArray = [
-            'image' => $path,
-            'staff_id' => $request->staff_id,
-            'item_id' => $request->item_id,
-            'description' => $request->description,
-        ];
+        $postData = new PostData(
+            path: $request->$path,
+            staff_id: $request->staff_id,
+            item_id: $request->item_id,
+            description: $request->description
+        );
 
-        $post->fill($postCreatArray)->save();
+        $postResult = $this->savePost->savePost($postData);
 
-        return response()->json($post);
+        return response()->json($postResult->$post);
     }
-  
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreStaffRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Staff  $staff
-     * @return \Illuminate\Http\Response
-     */
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Staff  $staff
-     * @return \Illuminate\Http\Response
-     */
-
-
+    
     /**
      * Update the specified resource in storage.
      *

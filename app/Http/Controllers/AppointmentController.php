@@ -9,7 +9,7 @@ use App\Models\Item;
 use Illuminate\Http\Request;
 use App\Models\Staff;
 use App\Data\AppointmentData;
-use App\Services\AppointmentSaverInterface;
+use App\Interfaces\AppointmentSaverInterface;
 use Illuminate\Support\Facades\Log;
 use App\Services\CreateTimeArray;
 use App\Services\GetReservedTimeArray;
@@ -50,7 +50,7 @@ class AppointmentController extends Controller
     }
 
     /**
-     * 予約可能な時間を表示
+     * 予約可能な時間を表示/スタッフが一人の時に使用
      *
      * @return \Illuminate\Http\Response
      */
@@ -60,35 +60,65 @@ class AppointmentController extends Controller
     //time取得 getTime
     $appointDate = $request->query('date');
     $times = $this->createTimeArray->createTimeArray();
-    $reservedTimes = $this->getReservedTimeArray->getReservedTime( $appointDate);
+    $reservedTimes = $this->getReservedTimeArray->getReservedTime($appointDate);
 
     $availableTimes = array_diff($times, $reservedTimes);
 
-
-    // return response()->json(array_values($availableTimes));
-
-    //setAvailableStaff
-    $staffAvailability = [];
-            foreach ($availableTimes as $time) {
-                $staffAvailability[$time] = Staff::whereNotIn('staff_id', function ($query) use ($appointDate, $time) {
-                    $query->select('staff_id')
-                        ->from('appointments')
-                        ->join('items', 'appointments.item_id', '=', 'items.item_id') 
-                        ->where('appointment_date', $appointDate)
-                        ->where('appointment_time', '<=', $time)
-                        ->whereRaw("DATE_ADD(appointment_time, INTERVAL items.duration MINUTE) > '{$time}'");
-                })->pluck('name'); // 空いているスタッフの名前を取得
-            }
-        
         //jsonでデータを返す
         return response()->json([
             'availableTimes' => array_values($availableTimes),
-            '$staffAvailability' => $staffAvailability
         ]); 
     }
 
- 
+    /**
+     * 予約可能なスタッフとアイテムを表示
+     */
+    public function getAvailableStaffItems(Request $request)
+    {
+        $appointDate = $request->query('date'); 
+        $times = $this->createTimeArray->createTimeArray();
+
+    $availableStaffItems = [];
+    foreach ($times as $time) {
+        $busyStaffs = Appointment::query()
+            ->where('appointment_date', $appointDate)
+            ->get()
+            ->filter(function ($appointment) use ($time) {
+                $appointmentTime = new \DateTime($appointment->appointment_time);
+                $roundedAppointmentTime = $this->roundToNearestQuarterHour($appointmentTime);
+                return $roundedAppointmentTime->format('H:i') === $time; 
+            })
+            ->pluck('staff_id');
     
+        $staffs = Staff::whereNotIn('staff_id', $busyStaffs)->get();
+        
+        foreach ($staffs as $staff) {
+            $items = Item::where('staff_id', $staff->staff_id)->get();
+            $itemNames = $items->pluck('name')->toArray();
+            
+            $availableStaffItems[$time][] = [
+                'staff_name' => $staff->name,
+                'available_items' => $itemNames,
+            ];
+        }
+    }
+
+    return response()->json($availableStaffItems);
+}
+
+     /**
+     * 時間を四半期単位（15分ごと）に丸める
+     *
+     * @param \DateTime $reservedTime - 丸める対象の時間
+     * @return \DateTime - 丸められた時間
+     */
+    private function roundToNearestQuarterHour($reservedTimes) {
+        $minutes = $reservedTimes->format('i');
+        $roundedMinutes = round($minutes / 15) * 15;
+    
+        return $reservedTimes->setTime($reservedTimes->format('H'), $roundedMinutes);
+    }
+
     /**
      * 予約の変更
      *
@@ -144,7 +174,6 @@ class AppointmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    //http://127.0.0.1:8000/api/app/search/item?name=カット
     public function searchAppointmentItem(Request $request)
     {
         $itemName = $request->query('name');
@@ -160,7 +189,6 @@ class AppointmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    //http://127.0.0.1:8000/api/app/search/date?date=1983-10-26
     public function searchAppointmentsByDateWithItems(Request $request)
     {
         $appointmentDate = $request->query('date');

@@ -2,9 +2,6 @@
 
 namespace App\Data;
 
-/**
- * 
- */
 class AppointmentData
 {
     public array $itemIds;

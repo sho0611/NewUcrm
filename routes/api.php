@@ -102,11 +102,12 @@ Route::prefix('app')->controller(AppointmentController::class)->group(function()
     // 顧客側
     Route::get('/create', 'createAppointment')->name('createAppointment');
     // 予約可能時間の表示
-    Route::get('times', 'getAvailableTimes')->name('getAvailableTimes');
+    Route::get('times', 'getAvailableTimes')->name('getAvailableItems');
+    Route::get('get', 'getAvailableStaffItems')->name('getAvailableItems');
     //予約の変更
-    Route::put('/{reviews}', 'changAppointment')->name('changAppointment');
+    Route::put('/{app}', 'changAppointment')->name('changAppointment');
     //予約の削除
-    Route::delete('/{reviews}', 'deleteAppointment')->name('deleteAppointment');
+    Route::delete('/{app}', 'deleteAppointment')->name('deleteAppointment');
     
     //http://127.0.0.1:8000/api/app/admin/view
     // 管理者側

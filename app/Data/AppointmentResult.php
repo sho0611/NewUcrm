@@ -4,9 +4,7 @@ namespace App\Data;
 
 class AppointmentResult
 {
-    /**
-     * @var array $$appointments 予約の配列
-     */
+    
     public array $appointments;
 
     /**
