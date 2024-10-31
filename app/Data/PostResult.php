@@ -2,14 +2,20 @@
 
 namespace App\Data;
 
+use App\Models\Post;
+
 class PostResult
 {
-    public array $posts;
+    public Post $post;
 
-    public function __construct(array $posts)
+ /**
+  * コンストラクタ
+  *
+  * @param $post 投稿情報を受け取ります
+  */
+    public function __construct(Post $post)
     {
-        $this->posts = $posts;
-        
+        $this->post = $post;
     }
 }
 

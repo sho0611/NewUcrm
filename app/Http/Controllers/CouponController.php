@@ -4,42 +4,42 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorecouponRequest;
 use App\Http\Requests\UpdatecouponRequest;
-use App\Models\Appointment;
 use App\Models\Coupon;
-use App\Models\CouponUsage;
-use App\Models\Customer;
+use App\Data\CouponData;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
-use App\Notifications\TopCouponNotification;
+use App\Interfaces\CouponSaverInterface;
 
 
 
 class CouponController extends Controller
 {
-       /**
-     * Show the form for creating a new resource.
+    protected $couponSaver;
+    public function __construct(CouponSaverInterface $couponSaver)
+    {
+        $this->couponSaver = $couponSaver;
+    }
+
+    /**
+     * クーポンを作成する
      *
      * @return \Illuminate\Http\Response
      */
     public function createCoupon(StorecouponRequest $request)
     {
-        $item = new coupon();
+        $couponData = new CouponData(
+            code: $request->code,
+            discount_value: $request->discount_value,
+            expiration_date: $request->expiration_date,
+            status: $request->status
+        );
 
-        $couponCreateArray = [
-            'code' => $request->code,
-            'discount_value' => $request->discount_value,
-            'expiration_date' => $request->expiration_date,
-            'status' => $request->status
-        ];
+        $couponResult = $this->couponSaver->saveCoupon($couponData);
     
-        $item->fill($couponCreateArray);
-        $item->save();
-    
-        return response()->json($couponCreateArray);
+        return response()->json($couponResult->coupon);
     }
 
         /**
-     * Update the specified resource in storage.
+     * クーポンの内容を変更、更新する
      *
      * @param  \App\Http\Requests\UpdatecouponRequest  $request
      * @param  \App\Models\coupon  $coupon
@@ -47,45 +47,43 @@ class CouponController extends Controller
      */
     public function updateCoupon(int $couponsId,UpdatecouponRequest $request)
     {
-        //$coupon = Coupon::query()->findOrFail($couponId);
-        //$coupon = Coupon::query()->findOrFail('coupon_id',$couponsId);
-        //$coupon = Coupon::where('coupon_id', $couponsId)->firstOrFail();
 
-        $coupon = Coupon::where('coupon_id', $couponsId)->get();
+        $couponData = new CouponData(
+            code: $request->code,
+            discount_value: $request->discount_value,
+            expiration_date: $request->expiration_date,
+            status: $request->status
+        );
 
-        //$coupon = Coupon::where('coupon_id', $couponsId)->firstOrFail();
-
-        $couponUpdateArray = [
-            'code' => $request->code,
-            'discount_value' => $request->discount_value,
-            'expiration_date' => $request->expiration_date,
-            'status' => $request->status,
-        ];
-        $coupon->fill($couponUpdateArray)
-        ->save();
-
-        return response()->json($coupon);         
+        $couponResult = $this->couponSaver->saveCoupon($couponData, $couponsId);
+    
+        return response()->json($couponResult->coupon);        
     }
 
     /**
-     * Remove the specified resource from storage.
+     * クーポンを削除する
      *
      * @param  \App\Models\coupon  $coupon
      * @return \Illuminate\Http\Response
      */
-    public function destroyCoupon(coupon $coupon)
+    public function destroyCoupon($couponsId)
     {
-        $coupon->delete();
-        return response()->json($coupon);
+        $coupon = Coupon::query()->findOrFail($couponsId);
+        if ($coupon) {
+            $coupon->delete();  
+            return response()->json(['message' => 'Deleted successfully']);
+        } else {
+            return response()->json(['message' => 'Record not found']);
+        }
     }
 
     /*
-     * Store a newly created resource in storage.
+     * 使用可能なクーポンを表示する
      *
      * @param  \App\Http\Requests\StorecouponRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function viewCoupon(StoreCouponRequest $request)
+    public function viewCoupon(Request $request)
     {
         $coupons = Coupon::query()
             ->select('*')
@@ -93,34 +91,5 @@ class CouponController extends Controller
             ->where('status', 'active')
             ->get();
         return response()->json($coupons);
-    }
-
-
-    //これはどこに書くのが適切か  //テストコード
-    public function sendCouponToTopCustomers()
-    {
-        $towMonthsago = now()->subMonth(2);
-
-        $topCustomers = Customer::query()
-        //直近2ヶ月の八百屋くを取得
-        ->where('appointment_date', '>=', $towMonthsago)
-        ->groupBy('customer_id')
-        //予約が2回以上の顧客を取得
-        ->havingRaw('count(*) >= 2')
-        ->pluck('customer_id');
-        
-        //送るクーポンを取得
-        $coupon = Coupon::where('discount_value', '50')
-        ->where('expiration_date', '>', Carbon::now()) 
-        ->first();
-
-        if ($coupon) {
-            $customers = Customer::whereIn('customer_id', $topCustomers)->get();
-            foreach ($customers as $customer)
-            {  
-                $customer->notify(new TopCouponNotification($coupon));
-                return response()->json(['message' => 'Coupon sent successfully!']);
-            }
-        }
     }
 }

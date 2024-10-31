@@ -10,7 +10,7 @@ class PostData
     public int $staff_id;
     public int $item_id;
     public string $description;
-    
+
     /**
      * PostData クラスのコンストラクタ
      *

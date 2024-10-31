@@ -24,7 +24,25 @@ class UpdatecouponRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:coupons,code' 
+            ],
+            'discount_value' => [
+                'required',
+                'integer',
+                'min:1' 
+            ],
+            'expiration_date' => [
+                'required',
+                'date'
+            ],
+            'status' => [
+                'required',
+                'in:active,inactive' 
+            ],
         ];
     }
 }

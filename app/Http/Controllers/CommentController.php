@@ -3,55 +3,60 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
-use App\Models\Post;
 use Illuminate\Http\Request;
+use App\Data\CommentData;
+use App\Interfaces\CommentSeverInterface;
+use App\Http\Requests\StoreCommentRequest;
+use App\Http\Requests\UpdateCommentRequest;
 
 class CommentController extends Controller
 {
+    private $commentSaver;
+    public function __construct(CommentSeverInterface $commentSaver)
+    {
+        $this->commentSaver = $commentSaver
+;   }
     
     /**
-     * Show the form for creating a new resource.
+     * コメントの作成
      *
      * @return \Illuminate\Http\Response
      */
-    public function postComment(Request $request)
+    public function postComment(StoreCommentRequest $request)
     {
-        $comment = new Comment();
-        $commentCreateArray = [
-            'content' => $request->content,
-            'post_id' => $request->post_id,
-            'customer_id' => $request->customer_id,
-        ];
-        $comment ->fill($commentCreateArray);
-        $comment ->save();
+        $commentData = new CommentData(
+        content: $request->content,
+        post_id: $request->post_id,
+        customer_id: $request->customer_id,
+        );
 
-        return response()->json($comment);
-    
+        $commentResult = $this->commentSaver->saveComment($commentData);
+
+        return response()->json($commentResult->comment);
     }
 
     /**
-     * Update the specified resource in storage.
+     * コメントの変更、更新
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function updateComment(int $itemsId, Request $request)
+    public function updateComment(int $commentId, UpdateCommentRequest $request)
     {
-        $comment = Comment::query()->findOrFail($itemsId);
-        $commentCreateArray = [
-            'content' => $request->content,
-            'post_id' => $request->post_id,
-            'customer_id' => $request->customer_id,
-        ];
-        $comment ->fill($commentCreateArray);
-        $comment ->save();
-
-        return response()->json($comment);
+        $commentData = new CommentData(
+            content: $request->content,
+            post_id: $request->post_id,
+            customer_id: $request->customer_id,
+            );
+    
+            $commentResult = $this->commentSaver->saveComment($commentData, $commentId);
+    
+            return response()->json($commentResult->comment);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * コメントの削除
      *
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\Response

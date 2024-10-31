@@ -33,7 +33,7 @@ class AppointmentController extends Controller
      * 予約の作成
      *
      * @param StoreAppointmentRequest $request
-     * @return void
+     * @return \Illuminate\Http\JsonResponse 予約結果をJSONで返却
      */
     public function createAppointment(StoreAppointmentRequest $request)
     {
@@ -135,7 +135,7 @@ class AppointmentController extends Controller
             appointmentDate: $request->appointment_date,
             appointmentTime: $request->appointment_time
         );
-        $appointmentResult = $this->appointmentSaver->saveAppointments($appointmentData);
+        $appointmentResult = $this->appointmentSaver->saveAppointments($appointmentData, $appId);
 
         return response()->json($appointmentResult->appointments);
     }

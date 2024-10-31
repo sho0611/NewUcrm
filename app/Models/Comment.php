@@ -15,7 +15,7 @@ class Comment extends Model
 
     protected $table = 'comments'; 
     protected $primaryKey = 'comment_id'; 
-    protected $keyType = 'int'; 
+
 
     public function post()
     {

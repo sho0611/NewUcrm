@@ -132,7 +132,7 @@ Route::prefix('coupon')->controller(CouponController::class)->group(function () 
     // 顧客側
     Route::get('/view', 'viewCoupon')->name('viewCoupon');
 });
-//クーポン利用、履歴
+//クーポン利用、履歴 //後回し
 Route::prefix('usecoupon')->controller(CouponUsageController::class)->group(function() {
     //顧客側
     Route::get('/use', 'useCoupon')->name('useCoupon');
@@ -163,8 +163,8 @@ Route::prefix('likes')->controller(LikeController::class)->group(function() {
 //SNS //コメント
 Route::prefix('com')->controller(CommentController::class)->group(function() {
     Route::post('/post', 'postComment')->name('postComment');
-    Route::put('/{comments}', 'updateComment')->name('updateComment');
-    Route::delete('/{comments}', 'deleteComment')->name('deleteComment');
+    Route::put('/{com}', 'updateComment')->name('updateComment');
+    Route::delete('/{com}', 'deleteComment')->name('deleteComment');
 });
 
 

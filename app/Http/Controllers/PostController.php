@@ -3,24 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Services\SavePost;
 use Illuminate\Http\Request;
 use App\Data\PostData;
+use App\Interfaces\PostSaverInterface;
+use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 
 class PostController extends Controller
 {
-    private $savePost;
-    public function __construct(SavePost $savePost)
+    private $postSaver;
+    public function __construct(PostSaverInterface $postSaver)
     {
-        $this->savePost = $savePost;
+        $this->postSaver = $postSaver;
     }
     /**
-     * Store a newly created resource in storage.
+     * 投稿内容の作成
      *
      * @param  \App\Http\Requests\StorePostRequest  $post
      * @return \Illuminate\Http\Response
      */
-    public function post(Request $request)
+    public function post(StorePostRequest $request)
     {
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('posts'); 
@@ -28,44 +30,40 @@ class PostController extends Controller
             return response()->json(['error' => 'No file uploaded']);
         }
         $postData = new PostData(
-            path: $request->$path,
+            path: $path,
             staff_id: $request->staff_id,
             item_id: $request->item_id,
             description: $request->description
         );
 
-        $postResult = $this->savePost->savePost($postData);
+        $postResult = $this->postSaver->savePost($postData);
 
-        return response()->json($postResult->$post);
+        return response()->json($postResult->post);
     }
     
     /**
-     * Update the specified resource in storage.
+     * 投稿を更新
      *
      * @param  \App\Http\Requests\UpdatePostRequest  $request
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function updatePost(int $postId,Request $request)
+    public function updatePost(int $postId,UpdatePostRequest $request)
     {
-        $post = Post::query()->findOrFail($postId);
-        
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('posts'); 
         } else {
             return response()->json(['error' => 'No file uploaded']);
         }
+        $postData = new PostData(
+            path: $path,
+            staff_id: $request->staff_id,
+            item_id: $request->item_id,
+            description: $request->description
+        );
+        $postResult = $this->postSaver->savePost($postData, $postId);
 
-        $postCreatArray = [
-            'image' => $path,
-            'staff_id' => $request->staff_id,
-            'item_id' => $request->item_id,
-            'description' => $request->description,
-        ];
-
-        $post->fill($postCreatArray)->save();
-
-        return response()->json($post);
+        return response()->json($postResult->post);
     }
 
     /**
@@ -83,7 +81,5 @@ class PostController extends Controller
         } else {
             return response()->json(['message' => 'Record not found']);
         }
-    
     }
-
 }

@@ -28,12 +28,19 @@ class SaveAppointment implements AppointmentSaverInterface
      * @param AppointmentData $appointmentData
      * @return AppointmentResult
      */
-    public function saveAppointments(AppointmentData $appointmentData): AppointmentResult
+    public function saveAppointments(AppointmentData $appointmentData, ?int $appId = null): AppointmentResult
     {
         $appointments = [];
-
         foreach ($appointmentData->itemIds as $index => $itemId) {
-            $appointment = new Appointment();
+            if ($appId) {
+                $appointment = Appointment::findOrFail($appId);
+                if (!$appointment)
+                {
+                    return response()->json(['error' => 'Appointment not found for ID: ' . $appId]);
+                }
+            } else {
+                $appointment = new Appointment(); 
+            }
     
             $createAppointments = [
                 'item_id' => $itemId,
@@ -49,8 +56,12 @@ class SaveAppointment implements AppointmentSaverInterface
             $appointments[] = $appointment;
         }
 
-        $this->sendNotificationItemNames->sendNotificationItemNames($appointments, $appointmentData->customerId, $appointmentData->itemIds,  $this->firstAppointmentTime);
-    
+        if ($appId) {
+            $this->sendNotificationItemNames->changeSendNotification($appointments, $appointmentData->customerId, $appointmentData->itemIds,  $this->firstAppointmentTime);
+        } else {
+            $this->sendNotificationItemNames->sendNotificationItemNames($appointments, $appointmentData->customerId, $appointmentData->itemIds,  $this->firstAppointmentTime);
+        }
+
         return new AppointmentResult($appointments);
     }
     /**
@@ -75,7 +86,6 @@ class SaveAppointment implements AppointmentSaverInterface
         }
     }
 }
-
 
 
 

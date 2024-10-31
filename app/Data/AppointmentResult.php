@@ -8,7 +8,7 @@ class AppointmentResult
     public array $appointments;
 
     /**
-     * AppointmentResult constructor.
+     * コンストラクタ
      *
      * @param array $appointments 予約の配列を受け取ります。
      */

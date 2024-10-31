@@ -9,6 +9,8 @@ use App\Models\Customer;
 class Coupon extends Model
 {
     use HasFactory;
+    protected $table = 'coupons'; 
+    protected $primaryKey = 'coupon_id'; 
 
     protected $fillable = ['code', 'discount_value', 'expiration_date','status'];
 
