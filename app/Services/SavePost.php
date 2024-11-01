@@ -9,7 +9,8 @@ use App\Interfaces\PostSaverInterface;
 class SavePost implements PostSaverInterface
 {
   /**
-   * 投稿内容を保存
+   * 投稿内容を保存する
+   * idがあれば更新、なければ新規作成
    *
    * @param PostData $postData
    * @param integer|null $postId

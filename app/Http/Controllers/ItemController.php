@@ -7,15 +7,83 @@ use App\Http\Requests\UpdateItemRequest;
 use App\Models\Customer;
 use App\Models\Item;
 use Illuminate\Http\Request;
-use App\Rules\ItemsRule;
-use Illuminate\Support\Facades\Log;
 use App\Models\ItemPurchase;
 use App\Models\Purchase;
-use GuzzleHttp\Psr7\Query;
+use App\Interfaces\ItemSaverInterface;
+use App\Data\ItemData;
 
 class ItemController extends Controller
-{  /**
-    * Display a listing of the resource.
+{ 
+    protected ItemSaverInterface $itemSaver;
+
+    public function __construct(ItemSaverInterface $itemSaver)
+    {
+        $this->itemSaver = $itemSaver;
+    }
+
+    /**
+     * アイテム(サービス内容)を作成する
+     *
+     * @param StoreItemRequest $request
+     * @return JsonResponse
+     */
+    public function createItem(StoreItemRequest $request)
+    {
+        $itemData = new ItemData(
+            name: $request->name,
+            memo: $request->memo,
+            price: $request->price,
+            is_selling: $request->is_selling,
+            duration: $request->duration
+
+        );
+        $itemResult = $this->itemSaver->saveItem($itemData);
+    
+        return response()->json($itemResult->item);
+    }
+    
+    /**
+     * アイテム(サービス内容)を変更、更新する
+     *
+     * @param  \App\Http\Requests\UpdateItemRequest  $request
+     * @param  \App\Models\Item  $item
+     * @return \Illuminate\Http\Response
+     */
+    public function updateItem(int $itemsId, UpdateItemRequest $request)
+    {
+        $itemData = new ItemData(
+            name: $request->name,
+            memo: $request->memo,
+            price: $request->price,
+            is_selling: $request->is_selling,
+            duration: $request->duration
+        );
+    
+        $itemResult = $this->itemSaver->saveItem($itemData, $itemsId);
+    
+        return response()->json($itemResult->item);
+    }
+
+    /**
+     * アイテム(サービス内容)を削除する
+     *
+     * @param  \App\Models\Item  $item
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteItem(int $itemId)
+    {
+        $item = Item::query()->findOrFail($itemId);
+        
+        if ($item) {
+            $item->delete();  
+            return response()->json(['message' => 'Deleted successfully']);
+        } else {
+            return response()->json(['message' => 'Record not found']);
+        }
+    }
+
+    /**
+    *アイテム一覧を表示する
     *
     * @return \Illuminate\Http\Response
     */
@@ -29,104 +97,35 @@ class ItemController extends Controller
    }
 
    /**
-    * Display a listing of the resource.
+    * アイテム詳細を取得する
     *
     * @return \Illuminate\Http\Response
     */
-    public function geItemDetail(int $itemsId, Request $request)
+    public function getItemDetail(int $itemsId, Request $request)
     {
-        $itemPurchase = ItemPurchase::query()
-        ->select('*')
-        ->where('item_id', $itemsId)
-        ->get();
+        $itemPurchases = ItemPurchase::query()
+            ->select('*')
+            ->where('item_id', $itemsId)
+            ->get();
 
-        $purchase_id = array_map(fn($itemPurchase) =>  $itemPurchase['purchase_id'], $itemPurchase->toArray());
+        $purchaseIds = $itemPurchases->pluck('purchase_id')->unique()->toArray();
 
         $purchases = Purchase::query()
-        ->select('*')
-        ->whereIn('id', $purchase_id)
-        ->get();
+            ->select('*')
+            ->whereIn('purchase_id', $purchaseIds)
+            ->get();
 
-        $customer_id = array_map(fn($purchases) => $purchases['customer_id'], $purchases->toArray());
-        $uniqueCustomerIds = array_unique($customer_id);
+        $customerIds = $purchases->pluck('customer_id')->unique()->toArray();
 
-        $customers = Customer::query();
-        $customers->selct('*')
-        ->whereIn('id', $uniqueCustomerIds)
-        ->get();
+        $customers = Customer::query()
+            ->select('*')
+            ->whereIn('customer_id', $customerIds)
+            ->get();
 
         $purchaseArray = $purchases->toArray();
         $purchaseArray['customers'] = $customers->toArray();
 
         return response()->json($purchaseArray);
-
-    } 
-   
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(StoreItemRequest $request) 
-    {
-        $item = new Item();
-
-        $itemCreateArray = [
-            'name' => $request->name,
-            'memo' => $request->memo,
-            'price' => $request->price,
-            'is_selling' => $request->is_selling
-        ];
-    
-        
-        $item->fill($itemCreateArray);
-        $item->save();
-    
-        return response()->json($item);
-    }
-   
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Item  $item
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Item $item)
-    {
-        return response()->json($item);
     }
 
-  
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateItemRequest  $request
-     * @param  \App\Models\Item  $item
-     * @return \Illuminate\Http\Response
-     */
-    public function update(int $itemsId, UpdateItemRequest $request)
-    {
-        $item = Item::query()->findOrFail($itemsId);
-
-        $itemupdateArry = [
-            'name' => $request->name,
-            'memo' => $request->memo,
-            'price' => $request->price,
-            'is_selling' => $request->is_selling
-        ];
-        $item->fill($itemupdateArry)->save();
-        return response()->json($item); 
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Item  $item
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Item $item)
-    {
-        $item->delete();
-        return response()->json($item);
-    }
 }

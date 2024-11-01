@@ -12,18 +12,17 @@ class SaveAppointment implements AppointmentSaverInterface
 {
     protected $sendNotificationItemNames;
     private $firstAppointmentTime;
-    /**
-     * SendNotificationItemNames constructor
-     *
-     * @param SendNotificationItemNames $sendNotificationItemNames
-     */
+
     public function __construct(SendNotificationItemNames $sendNotificationItemNames)
     {
        
         $this->sendNotificationItemNames = $sendNotificationItemNames;
     }
     /**
-     * 予約を保存
+     * 予約を保存する 
+     * idがあれば更新、なければ新規作成
+     * 予約時予約内容の通知を送信
+     * 予約変更時に予約内容の通知を送信
      *
      * @param AppointmentData $appointmentData
      * @return AppointmentResult

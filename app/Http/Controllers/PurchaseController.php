@@ -6,120 +6,80 @@ use App\Http\Requests\StorePurchaseRequest;
 use App\Http\Requests\UpdatePurchaseRequest;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
-use App\Models\Item;
-use App\Models\Customer;
+use App\Interfaces\PurchaseSaverInterface;
+use App\Data\PurchaseData;
 
 
 class PurchaseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function viewPurchase(Request $request)
-    {
-        $query = Purchase::query();
-        $orders = $query->leftJoin('item_purchase', 'purchases.id', '=', 'item_purchase.purchase_id')
-            ->leftJoin('items', 'item_purchase.item_id', '=', 'items.id')
-            ->leftJoin('customers', 'purchases.customer_id', '=', 'customers.id')
-            ->groupBy('purchases.id') 
-            ->selectRaw('purchases.id as id, SUM(items.price * item_purchase.quantity) as total, customers.name as customer_name,customers.kana as customer_kana ,purchases.status, purchases.created_at')
-            ->paginate(50);
-            
-        return response()->json($orders);
-    }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function viewPurchaseForm(Request $request)
-    {
-        $customers = Customer::select('id', 'name', 'kana')->get();
-        $items = Item::select('id', 'name', 'price')->where('is_selling', true)->get();
+    protected PurchaseSaverInterface $purchaseSaver;
 
-        return response()->json([
-            'items' => $items,
-            'customers' => $customers,
-        ]);
+    public function __construct(PurchaseSaverInterface $purchaseSaver)
+    {
+        $this->purchaseSaver = $purchaseSaver;
     }
-
+    
     /**
-     * Store a newly created resource in storage.
+     * 購入情報を作成する
      *
      * @param  \App\Http\Requests\StorePurchaseRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function createPurchaseForm(StorePurchaseRequest $request)
+    public function createPurchase(StorePurchaseRequest $request)
     {
-        $purchase = new Purchase();
+        $purchaseData = new PurchaseData(
+            customer_id: $request->customer_id,
+            status: $request->status,
+            items: $request->items
+        );
+    
+        $purchaseResult = $this->purchaseSaver->savePurchase($purchaseData);
 
-        $purchaseCreateArray = [
-            'customer_id' => $request->customer_id, 
-            'status' => $request->status
-        ];
-        //purchaseテーブル
-        $purchase->fill($purchaseCreateArray);
-        $purchase->save();
-
-        //中間テーブル
-        $purchase->items()->attach($request->items);
-
-        return response()->json($purchase);
+        return response()->json($purchaseResult->purchase);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Purchase  $purchase
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Purchase $purchase)
-    {
-        $orders = Purchase::query()
-            ->leftJoin('item_purchase', 'purchases.id', '=', 'item_purchase.purchase_id')
-            ->leftJoin('items', 'item_purchase.item_id', '=', 'items.id')
-            ->leftJoin('customers', 'purchases.customer_id', '=', 'customers.id')
-            ->where('purchases.id', $purchase->id) 
-            ->groupBy('purchases.id')
-            ->selectRaw('purchases.id as id, SUM(items.price * item_purchase.quantity) as total, customers.name as customer_name, customers.kana as customer_kana, purchases.status, purchases.created_at')
-            ->first(); 
-
-        return response()->json($orders);
-    }
-
-    /**
-     * Update the specified resource in storage.
+      /**
+     * 購入情報を変更、更新する
      *
      * @param  \App\Http\Requests\UpdatePurchaseRequest  $request
      * @param  \App\Models\Purchase  $purchase
      * @return \Illuminate\Http\Response
      */
-    public function update(int $requestId, UpdatePurchaseRequest $request)
+    public function updatePurchase(int $purchaseId, UpdatePurchaseRequest $request)
     {
-        $purchase = Purchase::query()->findOrFail($requestId);
+        $purchaseData = new PurchaseData(
+            customer_id: $request->customer_id,
+            status: $request->status,
+            items: $request->items
+        );
+    
+        $purchaseResult = $this->purchaseSaver->savePurchase($purchaseData,$purchaseId);
 
-        $purchaseUpdateArray = [
-            'customer_id' => $request->customer_id,
-            'status' => $request->status
-        ];
-
-        $purchase->fill($purchaseUpdateArray)->save();
-
-        $purchase->items()->sync($request->items);
-
-        return response()->json($purchase);
-         
+        return response()->json($purchaseResult->purchase);
     }
 
+
+       /**
+     * 購入情報を取得し、アイテムと顧客情報を取得する
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function viewPurchase(Request $request)
+    {
+        $orders = Purchase::getPurchaseWithDetails();
+        return response()->json($orders);
+    }
+
+
+  
+
     /**
-     * Remove the specified resource from storage.
+     * 購入情報を削除する
      *
      * @param  \App\Models\Purchase  $purchase
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Purchase $purchase)
+    public function destroyPurchas($purchase)
     {
         $purchase->delete();
         return response()->json($purchase);

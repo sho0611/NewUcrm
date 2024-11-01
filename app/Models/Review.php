@@ -24,4 +24,25 @@ class Review extends Model
     {
         return $this->belongsTo(Item::class,'service_id');
     }
+
+    /**
+     * レビューとアイテムを結合して取得する
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public static function getReviewsWithItems()
+    {
+        return self::query()
+            ->join('items', 'reviews.item_id', '=', 'items.item_id')
+            ->select(
+                'items.item_id AS item_id',
+                'items.name AS item_name',
+                'items.price AS item_price',
+                'reviews.customer_name',
+                'reviews.rating',
+                'reviews.comment',
+                'reviews.created_at'
+            )
+            ->get();
+    }
 }

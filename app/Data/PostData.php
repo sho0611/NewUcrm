@@ -14,7 +14,7 @@ class PostData
     /**
      * PostData クラスのコンストラクタ
      *
-     * @param string $path 画像パス
+     * @param string $image 画像パス
      * @param integer $staff_id スタッフのID
      * @param integer $item_id アイテムのID
      * @param string $description 投稿の説明

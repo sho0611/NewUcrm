@@ -10,6 +10,7 @@ class SaveComment implements CommentSeverInterface
 {
     /**
      * コメントを保存する
+     * idがあれば更新、なければ新規作成
      *
      * @param CommentData $commentData
      * @param integer|null $commentId

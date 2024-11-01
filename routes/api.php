@@ -50,46 +50,39 @@ Route::get('analysisRfm', [AnalysisRfmController::class, 'index']);
 
 //item関連
 Route::prefix('items')->controller(ItemController::class)->group(function () {
-    Route::get('/view', 'viewItems')->name('viewItems');  // GET /api/items/view       
-    Route::get('/{item}/get', 'getItemDetail')->name('getItemDetail');// GET /api/items/view
-    Route::get('create', 'create')->name('create');   // GET /api/items/create
-    Route::get('{item}', 'show')->name('show');       // GET /api/items/{item}
-    Route::put('{item}', 'update')->name('update');   // PUT /api/items/{item}
-    Route::delete('{item}', 'destroy')->name('destroy'); // DELETE /api/items/{item}
+    Route::get('create', 'createItem')->name('createItem');       
+    Route::put('{item}', 'updateItem')->name('updateItem');   
+    Route::delete('{item}', 'deleteItem')->name('eleteItem'); 
+
+    Route::get('/view', 'viewItems')->name('viewItems'); 
+    Route::get('/{item}', 'getItemDetail')->name('getItemDetail');
 });
 
 //customer関連
 Route::prefix('customers')->controller(CustomerController::class)->group(function () {
-    Route::get('/view', 'viewCustomers')->name('index'); // GET /api/customers
-    Route::get('/viewCustomerItems', 'viewCustomerItems')->name('viewCustomerItems'); // GET /api/viewCustomerItems
-    Route::get('/{customer}/get', 'getCustomerDetail')->name('getCustomerDetail'); // GET /api/get
-    Route::get('create', 'create')->name('create'); // GET /api/customers/create
-    Route::get('{customer}', 'show')->name('show'); // GET /api/customers/{customer}
-    Route::put('{customer}', 'update')->name('update'); //PUT /api/customers/{customer}
-    Route::delete('{customer}', 'destroy')->name('destroy');// DELETE /api/customers/{customer}
-    Route::get('/register', 'showRegistrationForm')->name('register');
+    Route::get('create', 'createCustomer')->name('createCustome');  
+    Route::put('{customers}', 'updateCustomer')->name('updateCustomer');
+    Route::delete('{customers}', 'deleteCustomer')->name('deleteCustomer');
+
+    Route::get('/view', 'viewCustomers')->name('viewCustomers');
+    Route::get('/{customers}', 'getCustomerDetail')->name('getCustomerDetail');
 });
 
 //Purchase関連
 Route::prefix('purchases')->controller(PurchaseController::class)->group(function () {
-    Route::get('/view', 'viewPurchase')->name('viewPurchase'); // GET /api/purchases/view
-    Route::get('/form', 'viewPurchaseForm')->name('viewPurchaseForm'); // GET /api/purchases/form
-    Route::get('/form/create', 'createPurchaseForm')->name('store'); // POST /api/purchases/create
-    Route::get('{purchase}', 'show')->name('show'); // GET /api/purchases/{purchase}
-    Route::put('{purchase}', 'update')->name('update'); // PUT /api/purchases/{purchase}
-    Route::delete('{purchase}', 'destroy')->name('destroy'); // DELETE /api/purchases/{purchase}
+    Route::get('/view', 'viewPurchase')->name('viewPurchase'); 
+    Route::get('/create', 'createPurchase')->name('createPurchaseForm');
+    Route::put('{purchase}', 'updatePurchase')->name('updatePurchase'); 
+    Route::delete('{purchase}', 'destroyPurchase')->name('destroyPurchas');
 });
 
 //レビュー関連
 Route::prefix('reviews')->controller(ReviewController::class)->group(function()  {
-    //顧客側 //レビュー作成
     Route::get('/create', 'createReview')->name('createReview');
     Route::put('/{reviews}', 'updateReviews')->name('updateReviews');
     Route::delete('/{reviews}', 'deleteReviews')->name('deleteReviews');
 
-    //レビュー閲覧 //レビューを見る
     Route::get('/view', 'viewReviews')->name('viewReviews');
-    //itemごとのレビューを見る
     Route::get('/{reviews}', 'viewItemReviews')->name('viewItemReviews');
     
 });
@@ -101,15 +94,11 @@ Route::post('/admin-login', [AdminLoginController::class, 'logIn'])->name('admin
 Route::prefix('app')->controller(AppointmentController::class)->group(function()  {
     // 顧客側
     Route::get('/create', 'createAppointment')->name('createAppointment');
-    // 予約可能時間の表示
     Route::get('times', 'getAvailableTimes')->name('getAvailableItems');
     Route::get('get', 'getAvailableStaffItems')->name('getAvailableItems');
-    //予約の変更
     Route::put('/{app}', 'changAppointment')->name('changAppointment');
-    //予約の削除
     Route::delete('/{app}', 'deleteAppointment')->name('deleteAppointment');
     
-    //http://127.0.0.1:8000/api/app/admin/view
     // 管理者側
     // Route::middleware('auth:sanctum')->group(function () {
         // 店側の予約検索
