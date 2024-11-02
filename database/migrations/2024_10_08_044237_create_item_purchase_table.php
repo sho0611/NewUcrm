@@ -14,14 +14,20 @@ return new class extends Migration
     public function up()
     {
         Schema::create('item_purchase', function (Blueprint $table) {
+            
             $table->id('item_purchase_id');
+
             $table->foreignId('item_id')
-                ->onUpdate('cascade')
-                ->onDelete('cascade'); 
+            ->references('item_id')
+            ->on('items')
+            ->onDelete('cascade')
+            ->onDelete('cascade');
 
             $table->foreignId('purchase_id')
-                ->onUpdate('cascade')
-                ->onDelete('cascade'); 
+            ->references('purchase_id')
+            ->on('purchases')
+            ->onDelete('cascade')
+            ->onDelete('cascade');
                 
             $table->integer('quantity');
             $table->timestamps();

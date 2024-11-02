@@ -34,7 +34,6 @@ class PurchaseController extends Controller
         );
     
         $purchaseResult = $this->purchaseSaver->savePurchase($purchaseData);
-
         return response()->json($purchaseResult->purchase);
     }
 

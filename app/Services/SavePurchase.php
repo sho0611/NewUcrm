@@ -35,7 +35,7 @@ class SavePurchase implements PurchaseSaverInterface
         
         $purchase->fill($purchaseCreateArray);
         $purchase->save();
-
+        
         foreach ($purchaseData->items as $item) {
             $purchase->items()->attach($item['item_id'], ['quantity' => $item['quantity']]);}
 

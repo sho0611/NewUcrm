@@ -17,8 +17,8 @@ class Subtotal implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-    $sql = 'select purchases.id as id
-    , item_purchase.id as pivot_id
+    $sql = 'select purchases.purchase_id as id
+    , item_purchase.item_purchase_id as pivot_id
     , items.price * item_purchase.quantity as subtotal
     , customers.name as customer_name
     , items.name as item_name
@@ -29,9 +29,9 @@ class Subtotal implements Scope
     , purchases.created_at
     , purchases.updated_at
     from purchases
-    left join item_purchase on purchases.id = item_purchase.purchase_id
-    left join items on item_purchase.item_id = items.id
-    left join customers on purchases.customer_id = customers.id
+    left join item_purchase on purchases.purchase_id = item_purchase.purchase_id
+    left join items on item_purchase.item_id = items.item_id
+    left join customers on purchases.customer_id = customers.customer_id
     ';
 
     $builder->fromSub($sql, 'order_subtotals');

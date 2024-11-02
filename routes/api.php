@@ -38,12 +38,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //売り上げ分析 日/月/年
 Route::prefix('analysis')->controller(AnalysisController::class)->group(function () {
     Route::get('/day', 'analysisDay')->name('analysisDay');
-    Route::get('/month', 'analysisMonth')->name('analysisMonth');
+    Route::get('/month', 'analysisMouth')->name('analysisMonth');
     Route::get('/year', 'analysisYear')->name('analysisYear');
 });
 
 //データ分析 デシル
-Route::get('analysisDesile', [AnalysisDesileController::class, 'index']);
+Route::get('desile', [AnalysisDesileController::class, 'index']);
 
 //データ分析 RFM
 Route::get('analysisRfm', [AnalysisRfmController::class, 'index']);
@@ -121,11 +121,10 @@ Route::prefix('coupon')->controller(CouponController::class)->group(function () 
     // 顧客側
     Route::get('/view', 'viewCoupon')->name('viewCoupon');
 });
+
 //クーポン利用、履歴 //後回し
 Route::prefix('usecoupon')->controller(CouponUsageController::class)->group(function() {
-    //顧客側
     Route::get('/use', 'useCoupon')->name('useCoupon');
-    //管理者側
     Route::get('/view', 'viewUsages')->name('viewUsages');
 });
 
