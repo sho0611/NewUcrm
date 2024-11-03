@@ -13,21 +13,22 @@ class AnalysisDesileController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse デシル分析結果
      */
-    public function index(Request $request)
+    public function desile(Request $request)
     {
         $startDate = $request->query('startDate'); 
         $endDate = $request->query('endDate');
 
-        $subQuery = Order::betweenDate($startDate, $endDate);
+        $subtotal = Order::betweenDate($startDate, $endDate);
     
-        $totalSalesPerPurchase = $this->getTotalSalesPerPurchase($subQuery);
-        
+        $totalSalesPerPurchase = $this->getTotalSalesPerPurchase($subtotal);
+
         $salesTotalByCustomer = $this->getSalesTotalByCustomer($totalSalesPerPurchase);
         
         $salesWithRowNum = $this->addRowNumbers($salesTotalByCustomer);
-       
+
         $divideIntoDeciles = $this->createdivideIntoDeciles($salesWithRowNum); 
-      
+        return response()->json($divideIntoDeciles);
+
         $avarageTotalPerGroup = $this->createAvarageTotalPerGroup($divideIntoDeciles);
 
         $total = $salesWithRowNum->sum('total');
@@ -68,7 +69,6 @@ class AnalysisDesileController extends Controller
         })->sortByDesc('total')->values();
     }
 
-
     /**
      * 行番号を追加
      *
@@ -93,7 +93,6 @@ class AnalysisDesileController extends Controller
     private function createDivideIntoDeciles($salesWithRowNum)
     {
         $count = $salesWithRowNum->count();
-        $total = $salesWithRowNum->sum('total');
     
         $decileSize = ceil($count / 10); 
         $bindValues = [];

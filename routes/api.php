@@ -36,17 +36,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 //売り上げ分析 日/月/年
-Route::prefix('analysis')->controller(AnalysisController::class)->group(function () {
+Route::prefix('ana')->controller(AnalysisController::class)->group(function () {
     Route::get('/day', 'analysisDay')->name('analysisDay');
-    Route::get('/month', 'analysisMouth')->name('analysisMonth');
+    Route::get('/mouth', 'analysisMouth')->name('analysisMonth');
     Route::get('/year', 'analysisYear')->name('analysisYear');
 });
 
 //データ分析 デシル
-Route::get('desile', [AnalysisDesileController::class, 'index']);
+Route::get('desile', [AnalysisDesileController::class, 'desile']);
 
 //データ分析 RFM
-Route::get('analysisRfm', [AnalysisRfmController::class, 'index']);
+Route::get('rfm', [AnalysisRfmController::class, 'index']);
 
 //item関連
 Route::prefix('items')->controller(ItemController::class)->group(function () {
