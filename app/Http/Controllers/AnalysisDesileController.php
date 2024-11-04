@@ -26,7 +26,7 @@ class AnalysisDesileController extends Controller
         
         $salesWithRowNum = $this->addRowNumbers($salesTotalByCustomer);
 
-        $divideIntoDeciles = $this->createdivideIntoDeciles($salesWithRowNum); 
+        $divideIntoDeciles = $this->createdivideIntoDeciles($salesWithRowNum);
 
         $avarageTotalPerGroup = $this->createAvarageTotalPerGroup($divideIntoDeciles);
 
@@ -58,11 +58,11 @@ class AnalysisDesileController extends Controller
      */
     private function getSalesTotalByCustomer($totalSalesPerPurchase)
     {
-        return $totalSalesPerPurchase->groupBy('customer_id')->map(function($items) {
+        return $totalSalesPerPurchase->groupBy('customer_id')->map(function($data) {
             return [
-                'customer_id' => $items->first()->customer_id,
-                'customer_name' => $items->first()->customer_name,
-                'total' => $items->sum('totalPerPurchase'),
+                'customer_id' => $data->first()->customer_id,
+                'customer_name' => $data->first()->customer_name,
+                'total' => $data->sum('totalPerPurchase'),
             ];
             
         })->sortByDesc('total')->values();
@@ -106,7 +106,7 @@ class AnalysisDesileController extends Controller
         return $salesWithRowNum->map(function($data) use ($bindValues) {
             for ($i = 0; $i < count($bindValues); $i += 2) {
                 if ($data['row_num'] >= $bindValues[$i] && $data['row_num'] <= $bindValues[$i + 1]) {
-                    $item['decile'] = ($i / 2) + 1;
+                    $data['decile'] = ($i / 2) + 1;
                     break;
                 }
             }

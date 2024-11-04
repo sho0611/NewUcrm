@@ -46,7 +46,7 @@ Route::prefix('ana')->controller(AnalysisController::class)->group(function () {
 Route::get('desile', [AnalysisDesileController::class, 'desile']);
 
 //データ分析 RFM
-Route::get('rfm', [AnalysisRfmController::class, 'index']);
+Route::get('rfm', [AnalysisRfmController::class, 'rfm']);
 
 //item関連
 Route::prefix('items')->controller(ItemController::class)->group(function () {
@@ -136,10 +136,11 @@ Route::prefix('sns')->controller(PostController::class)->group(function() {
     //ユーザー側
     Route::post('{sns}', 'updatePost')->name('postUpdate');
     Route::delete('{sns}', 'deletePost')->name('postDestroy'); 
-    // Route::get('/view', 'viewPosts')->name('viewPosts');
-    // Route::get('/{sns}', 'likeCount')->name('likeCount');
-    // Route::get('/{sns}', 'viewComment')->name('viewComment');
-    // Route::get('/{sns}', 'viewItemPost')->name('viewItemPost');
+
+    Route::get('/view', 'viewPosts')->name('viewPosts');
+    Route::get('/{postId}', 'countLikesbyPost')->name('countLikesbyPost');
+    Route::get('/comment/{postId}', 'getPostComments')->name('getPostComments');
+    Route::get('/item/{itemId}', 'getItemPost')->name('getItemPost');
 });
 
 //SNS //いいね
@@ -149,7 +150,7 @@ Route::prefix('likes')->controller(LikeController::class)->group(function() {
     Route::delete('/{likes}', 'deleteLike')->name('deleteLike');
 });
 //SNS //コメント
-Route::prefix('com')->controller(CommentController::class)->group(function() {
+Route::prefix('comments')->controller(CommentController::class)->group(function() {
     Route::post('/post', 'postComment')->name('postComment');
     Route::put('/{com}', 'updateComment')->name('updateComment');
     Route::delete('/{com}', 'deleteComment')->name('deleteComment');
