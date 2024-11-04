@@ -27,7 +27,6 @@ class AnalysisDesileController extends Controller
         $salesWithRowNum = $this->addRowNumbers($salesTotalByCustomer);
 
         $divideIntoDeciles = $this->createdivideIntoDeciles($salesWithRowNum); 
-        return response()->json($divideIntoDeciles);
 
         $avarageTotalPerGroup = $this->createAvarageTotalPerGroup($divideIntoDeciles);
 
@@ -78,9 +77,9 @@ class AnalysisDesileController extends Controller
     private function addRowNumbers($salesTotalByCustomer)
     {
         $rownum = 0; 
-        return $salesTotalByCustomer->map(function($item) use (&$rownum) {
-            $item['row_num'] = ++$rownum; 
-            return $item;
+        return $salesTotalByCustomer->map(function($data) use (&$rownum) {
+            $data['row_num'] = ++$rownum; 
+            return $data;
         });
     }
     
@@ -104,14 +103,14 @@ class AnalysisDesileController extends Controller
             array_push($bindValues, min($tempValue, $count)); 
         }
 
-        return $salesWithRowNum->map(function($item) use ($bindValues) {
+        return $salesWithRowNum->map(function($data) use ($bindValues) {
             for ($i = 0; $i < count($bindValues); $i += 2) {
-                if ($item['row_num'] >= $bindValues[$i] && $item['row_num'] <= $bindValues[$i + 1]) {
+                if ($data['row_num'] >= $bindValues[$i] && $data['row_num'] <= $bindValues[$i + 1]) {
                     $item['decile'] = ($i / 2) + 1;
                     break;
                 }
             }
-            return $item;
+            return $data;
         });
     }
 
@@ -123,11 +122,11 @@ class AnalysisDesileController extends Controller
      */
     private function createAvarageTotalPerGroup($divideIntoDeciles)
     {
-        return $divideIntoDeciles->groupBy('decile')->map(function($items){
+        return $divideIntoDeciles->groupBy('decile')->map(function($data){
             return [
-                'decile' => $items->first()['decile'],
-                'average' => round($items->avg('total'),1),
-                'totalPerGroup' => $items->sum('total')
+                'decile' => $data->first()['decile'],
+                'average' => round($data->avg('total'),1),
+                'totalPerGroup' => $data->sum('total')
             ];
 
         });
@@ -142,9 +141,9 @@ class AnalysisDesileController extends Controller
      */
     private function calculateTotalRatios($averageTotalPerGroup, $total)
     {
-        return $averageTotalPerGroup->map(function($item) use ($total) {
-            $item['totalRatio'] = round(100 * ($item['totalPerGroup']) / $total, 1);
-            return $item;
+        return $averageTotalPerGroup->map(function($data) use ($total) {
+            $data['totalRatio'] = round(100 * ($data['totalPerGroup']) / $total, 1);
+            return $data;
         });
     }
 }

@@ -14,7 +14,7 @@ class AnalysisRfmController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse RFMスコア
      */ 
-    public function index(Request $request)
+    public function rfm(Request $request)
     {
         $startDate = $request->query('startDate'); 
         $endDate = $request->query('endDate');
