@@ -10,14 +10,14 @@ use Illuminate\View\View;
 class AdminLoginController extends Controller
 {
   
-   //ログイン: store()メソッドで認証を行い、成功時にユーザー情報と成功メッセージをJSONで返す
+   
     public function logIn(AdminLoginRequest $request)
     {
         //dd($request);
         $credentials = $request->only('name', 'password');
 
         if (Auth::guard('admin')->attempt($credentials)) {
-            //ログインした管理者の情報を取得 //管理者の詳細情報へアクセス化
+          
             $admin = Auth::guard('admin')->user(); 
               
             return response()->json([

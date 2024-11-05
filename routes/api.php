@@ -16,6 +16,7 @@ use App\Http\Controllers\CouponUsageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\AuthController;
 //use App\Http\Controllers\Auth\StaffController;
 
 
@@ -31,8 +32,15 @@ use App\Http\Controllers\CommentController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 //売り上げ分析 日/月/年
@@ -87,9 +95,6 @@ Route::prefix('reviews')->controller(ReviewController::class)->group(function() 
     
 });
 
-//管理ログイン
-Route::post('/admin-login', [AdminLoginController::class, 'logIn'])->name('admin.login.store');
-
 //予約関係
 Route::prefix('app')->controller(AppointmentController::class)->group(function()  {
     // 顧客側
@@ -98,17 +103,11 @@ Route::prefix('app')->controller(AppointmentController::class)->group(function()
     Route::get('get', 'getAvailableStaffItems')->name('getAvailableItems');
     Route::put('/{app}', 'changAppointment')->name('changAppointment');
     Route::delete('/{app}', 'deleteAppointment')->name('deleteAppointment');
-    
-    // 管理者側
-    // Route::middleware('auth:sanctum')->group(function () {
-        // 店側の予約検索
-        Route::get('view', 'view')->name('view');
 
-        Route::get('search/item', 'searchAppointmentItem')->name('searchAppointmentItem');
-        Route::get('search/date', 'searchAppointmentsByDateWithItems')->name('AppointmentsByDateWithItems');
-        //管理ログアウト
-        // Route::delete('/admin-login', [AdminLoginController::class, 'logOut'])->name('admin.login.destroy');
-    // });
+    Route::get('view', 'view')->name('view');
+
+    Route::get('search/item', 'searchAppointmentItem')->name('searchAppointmentItem');
+    Route::get('search/date', 'searchAppointmentsByDateWithItems')->name('AppointmentsByDateWithItems');
 });
 
 //クーポン関連
@@ -122,7 +121,7 @@ Route::prefix('coupon')->controller(CouponController::class)->group(function () 
     Route::get('/view', 'viewCoupon')->name('viewCoupon');
 });
 
-//クーポン利用、履歴 //後回し
+//クーポン利用、履歴 
 Route::prefix('usecoupon')->controller(CouponUsageController::class)->group(function() {
     Route::get('/use', 'useCoupon')->name('useCoupon');
     Route::get('/view', 'viewUsages')->name('viewUsages');
