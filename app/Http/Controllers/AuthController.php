@@ -20,6 +20,7 @@ class AuthController extends Controller
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
             Log::info(get_class($user));
+                          //ここでUndefined method 'createToken'が発生してます
             $token = $user->createToken('AccessToken')->plainTextToken;
             return response()->json(['token' => $token]);
         } else {
