@@ -9,27 +9,31 @@ use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+    /**
+     * ユーザー登録
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */ 
     public function login(Request $request)
     {
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
             Log::info(get_class($user));
             $token = $user->createToken('AccessToken')->plainTextToken;
-            return response()->json(['token' => $token], 200);
+            return response()->json(['token' => $token]);
         } else {
-            return response()->json(['error' => '認証に失敗しました。'], 401);
+            return response()->json(['error' => '認証に失敗しました。']);
         }
     }
 
-    public function user(Request $request){
-        return response()->json(
-            [
-                $request->user()->name,
-                $request->user()->email,
-            ]
-        );
-    }
 
+    /**
+     * ログアウト
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */ 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
