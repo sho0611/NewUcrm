@@ -1,14 +1,14 @@
 <?php
 
 
-namespace Tests\Unit;
+// namespace Tests\Unit;
 
-use Tests\TestCase;
-use Mockery;
-use App\Services\SaveAppointment;
-use App\Services\AppointmentSaverInterface;
-use App\Data\AppointmentData;
-use App\Data\AppointmentResult;
+// use Tests\TestCase;
+// use Mockery;
+// use App\Services\SaveAppointment;
+// use App\Services\AppointmentSaverInterface;
+// use App\Data\AppointmentData;
+// use App\Data\AppointmentResult;
 
 // class SaveAppointmentTest extends TestCase
 // {
@@ -36,21 +36,21 @@ use App\Data\AppointmentResult;
 
 //         // saveAppointments メソッドが期待する値を返すように設定
 //         $appointmentSaverMock->shouldReceive('saveAppointments')
-//                              ->once()
-//                              ->with($appointmentData)
-//                              ->andReturn(new AppointmentResult([]));
+//                         ->once()
+//                         ->with($appointmentData)
+//                         ->andReturn(new AppointmentResult([]));
 
         
 //         // モックを使って SaveAppointment インスタンスを作成
-//         $saveAppointment = new SaveAppointment($appointmentSaverMock);
-//         // dd( $saveAppointment );
+//     //     $saveAppointment = new SaveAppointment($appointmentSaverMock);
+//     //     // dd( $saveAppointment );
 
-//         // saveAppointments メソッドを実行し、結果を検証
-//         $result = $saveAppointment->saveAppointments($appointmentData);
+//     //     // saveAppointments メソッドを実行し、結果を検証
+//     //     $result = $saveAppointment->saveAppointments($appointmentData);
 
-//         // 返された結果が AppointmentResult インスタンスであることを確認
-//         $this->assertInstanceOf(AppointmentResult::class, $result);
-//     }
+//     //     // 返された結果が AppointmentResult インスタンスであることを確認
+//     //     $this->assertInstanceOf(AppointmentResult::class, $result);
+//     // }
 // }
 
 

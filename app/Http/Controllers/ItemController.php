@@ -82,20 +82,6 @@ class ItemController extends Controller
         }
     }
 
-    /**
-    *アイテム一覧を表示する
-    *
-    * @return \Illuminate\Http\Response
-    */
-   public function viewItems(Request $request)
-   {
-        $items = Item::query()
-        ->select('*')
-        ->get();
-
-        return response()->json($items);
-   }
-
    /**
     * アイテム詳細を取得する
     *
@@ -127,5 +113,4 @@ class ItemController extends Controller
 
         return response()->json($purchaseArray);
     }
-
 }

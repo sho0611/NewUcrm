@@ -19,8 +19,9 @@ class AccountSeeder extends Seeder
     DB::table('accounts')->insert([
         [
             'name' => 'testuser',
-            'email' => 'test@example.com',
+            'email' => 'kan@example.com',
             'password' => Hash::make('password'),
+            'staff_id' => 3 
         ]
     ]);
 }

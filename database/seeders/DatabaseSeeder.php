@@ -28,13 +28,13 @@ class DatabaseSeeder extends Seeder
         //  \App\Models\Customer::factory(150)->create();
         //  \App\Models\Appointment::factory(500)->create();
        
-        $items = Item::all();
-         Purchase::factory(1000)->create()
-         ->each(function (Purchase $purchase) use ($items) {
-             $purchase->items()->attach(
-                 $items->random(rand(1, 10))->pluck('item_id')->toArray(),
-                 ['quantity' => rand(1, 5)] 
-             );
-         });
+        // $items = Item::all();
+        //  Purchase::factory(1000)->create()
+        //  ->each(function (Purchase $purchase) use ($items) {
+        //      $purchase->items()->attach(
+        //          $items->random(rand(1, 10))->pluck('item_id')->toArray(),
+        //          ['quantity' => rand(1, 5)] 
+        //      );
+        //  });
     }
 }

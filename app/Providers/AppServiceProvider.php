@@ -19,6 +19,8 @@ use App\Services\SaveCustomer;
 use App\Interfaces\CustomerSaverInterface;
 use App\Interfaces\ItemSaverInterface;
 use App\Services\SaveItem;
+use App\Services\SaveStaff;
+use App\Interfaces\StaffSaverInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -55,6 +57,9 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(ItemSaverInterface::class,
         SaveItem::class);
+
+        $this->app->bind(StaffSaverInterface::class,
+        SaveStaff::class);  
     }
     /**
      * Bootstrap any application services.

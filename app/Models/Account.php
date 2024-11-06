@@ -15,6 +15,7 @@ class Account extends Authenticatable
         'name',
         'email',
         'password',
+        'staff_id'
     ];
 
     protected $hidden = [
@@ -25,4 +26,9 @@ class Account extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class);
+    }   
 }

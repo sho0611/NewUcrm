@@ -21,5 +21,16 @@ class Staff extends Model
         return $this->hasMany(Appointment::class);
     }
 
+    public function account()
+    {
+        return $this->hasOne(Account::class);
+    }
+
+    public function loginHistories()
+    {
+        return $this->hasMany(LoginHistory::class, 'staff_id', 'staff_id');
+    }
+
+
 }
 

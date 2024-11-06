@@ -76,20 +76,4 @@ class CouponController extends Controller
             return response()->json(['message' => 'Record not found']);
         }
     }
-
-    /*
-     * 使用可能なクーポンを表示する
-     *
-     * @param  \App\Http\Requests\StorecouponRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function viewCoupon(Request $request)
-    {
-        $coupons = Coupon::query()
-            ->select('*')
-            ->where('expiration_date', '>', now()) 
-            ->where('status', 'active')
-            ->get();
-        return response()->json($coupons);
-    }
 }
