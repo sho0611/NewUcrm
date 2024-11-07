@@ -9,13 +9,17 @@ use App\Http\Requests\StoreStaffRequest;
 use App\Http\Requests\UpdateStaffRequest;
 use App\Models\LoginHistory;    
 use Carbon\Carbon;
+use App\Services\WorkTimeService;   
 
 class StaffController extends Controller
 {
     private $staffSaver;
-    public function __construct(StaffSaverInterface $staffSaver)
+    protected $workTimeService;
+
+    public function __construct(StaffSaverInterface $staffSaver,WorkTimeService $workTimeService)
     {
         $this->staffSaver = $staffSaver;
+        $this->workTimeService = $workTimeService;
     }
     /**
      * スタッフ情報の作成
@@ -65,24 +69,40 @@ class StaffController extends Controller
         }
     }
 
+    /**
+     * スタッフの勤務時間を取得
+     *
+     * @param  int  $staffId
+     * @return \Illuminate\Http\Response
+     */ 
     public function getStaffWorkTime(int $staffId)
     {
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
-
-        $staff = Staff::query()
-        ->where('staff_id', $staffId)->get();
-        $staffId = $staff->pluck('staff_id'); 
-        
+    
+        $staff = Staff::query()->where('staff_id', $staffId)->first();
+        if (!$staff) {
+            return response()->json(['message' => 'Staff not found']);
+        }
+    
         $loginHistories = LoginHistory::query()
-        ->where('staff_id', $staffId)
-        ->where('logout_time', $currentMonth)
-        ->where('login_time', $currentYear)
-        ->get();
+            ->where('staff_id', $staffId)
+            ->whereMonth('logout_time', $currentMonth) 
+            ->whereYear('logout_time', $currentYear)  
+            ->get();
 
-        $staffArray = $staff->toArray();    
+        $workTime = $this->workTimeService->calculateTotalWorkTime($loginHistories); 
+
+        $hours = $workTime['hours'];    
+        $minutes = $workTime['minutes'];
+        $totalWorkDay = $workTime['totalWorkDay'];    
+
+        $staffArray = $staff->toArray();
         $staffArray['loginHistories'] = $loginHistories->toArray();
-        
-        return response()->json($staffArray);   
+        $staffArray['totalWorkTime'] = "{$hours}時間{$minutes}分";
+        $staffArray['totalWorkDay'] = $totalWorkDay;
+    
+        return response()->json($staffArray);    
     }
+    
 }

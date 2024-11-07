@@ -89,11 +89,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     //スタッフ関連
-    // Route::prefix('staffs')->controller(StaffController::class)->group(function () {
-    //     Route::get('create', 'createStaff')->name('createStaff');
-    //     Route::put('{staffs}', 'updateStaff')->name('updateStaff');
-    //     Route::delete('{staffs}', 'deleteStaff')->name('deleteStaff');
-    // }); 
+    Route::prefix('staffs')->controller(StaffController::class)->group(function () {
+        Route::get('create', 'createStaff')->name('createStaff');
+        Route::put('{staffs}', 'updateStaff')->name('updateStaff');
+        Route::delete('{staffs}', 'deleteStaff')->name('deleteStaff');
+        
+        Route::get('work/{staffs}', 'getStaffWorkTime')->name('getStaffWorkTime');  
+    }); 
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
@@ -130,14 +132,6 @@ Route::prefix('reviews')->controller(ReviewController::class)->group(function() 
     Route::get('/view', 'viewReviews')->name('viewReviews');
     Route::get('/{reviews}', 'viewItemReviews')->name('viewItemReviews');    
 });
-
-Route::prefix('staffs')->controller(StaffController::class)->group(function () {
-    Route::get('create', 'createStaff')->name('createStaff');
-    Route::put('{staffs}', 'updateStaff')->name('updateStaff');
-    Route::delete('{staffs}', 'deleteStaff')->name('deleteStaff');
-    
-    Route::get('work/{staffs}', 'getStaffWorkTime')->name('getStaffWorkTime');  
-}); 
 
 //スタッフ関連
 Route::get('staffs/view', [GestStaffController::class, 'viewStaff'])->name('viewStaff');  
