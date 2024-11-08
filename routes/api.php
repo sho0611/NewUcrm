@@ -23,6 +23,7 @@ use App\Http\Controllers\GestCouponController;
 use App\Http\Controllers\GestPostController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\GestStaffController;   
+use App\Http\Controllers\StripePaymentsController;
 
 
 /*
@@ -107,6 +108,9 @@ Route::prefix('analysis')->controller(AnalysisController::class)->group(function
     Route::get('/mouth', 'analysisMouth')->name('analysisMonth');
     Route::get('/year', 'analysisYear')->name('analysisYear');
 });
+
+Route::post('/payment', [StripePaymentsController::class, 'payment'])->name('api.payment');
+Route::get('/payment/complete', [StripePaymentsController::class, 'complete'])->name('api.complete');
 
 //データ分析 デシル
 Route::get('desile', [AnalysisDesileController::class, 'desile']);
