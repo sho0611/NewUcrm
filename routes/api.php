@@ -24,6 +24,7 @@ use App\Http\Controllers\GestPostController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\GestStaffController;   
 use App\Http\Controllers\StripePaymentsController;
+use App\Http\Controllers\PayPayController;  
 
 
 /*
@@ -111,6 +112,13 @@ Route::prefix('analysis')->controller(AnalysisController::class)->group(function
 
 Route::post('/payment', [StripePaymentsController::class, 'payment'])->name('api.payment');
 Route::get('/payment/complete', [StripePaymentsController::class, 'complete'])->name('api.complete');
+
+Route::prefix('paypay')->as('paypay.')->group(function () {
+    Route::post('/payment', [PayPayController::class, 'payment'])->name('payment');
+    Route::post('/webhook', [PayPayController::class, 'webhook']);
+});
+
+
 
 //データ分析 デシル
 Route::get('desile', [AnalysisDesileController::class, 'desile']);
