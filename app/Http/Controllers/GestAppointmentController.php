@@ -13,6 +13,11 @@ use App\Interfaces\AppointmentSaverInterface;
 use Illuminate\Support\Facades\Log;
 use App\Services\CreateTimeArray;
 use App\Services\GetReservedTimeArray;
+use Stripe\Stripe;
+use Stripe\Refund;
+use App\Models\StripePayment;  
+use Exception;
+use App\Services\DeleteAppointment;
 
 
 
@@ -23,13 +28,15 @@ class GestAppointmentController extends Controller
     protected $getReservedTimeArray;
     protected $createTimeArray;
     protected $stripePaymentsController;
+    protected $deleteAppointment;
     
-    public function __construct(AppointmentSaverInterface $appointmentSaver, GetReservedTimeArray $getReservedTimeArray,CreateTimeArray $createTimeArray, StripePaymentsController $stripePaymentsController)   
+    public function __construct(AppointmentSaverInterface $appointmentSaver, GetReservedTimeArray $getReservedTimeArray,CreateTimeArray $createTimeArray, StripePaymentsController $stripePaymentsController, DeleteAppointment $deleteAppointment)    
     {
         $this->appointmentSaver = $appointmentSaver; 
         $this->getReservedTimeArray = $getReservedTimeArray;
         $this->createTimeArray = $createTimeArray; 
         $this->stripePaymentsController = $stripePaymentsController;
+        $this->deleteAppointment = $deleteAppointment;
     }
      /**
      * 予約の作成
@@ -39,9 +46,10 @@ class GestAppointmentController extends Controller
      */
     public function createAppointment(StoreAppointmentRequest $request)
     {
+        $appointmentId = null;
         if ($request->payment_method === 'online') {
 
-            $paymentResult = $this->stripePaymentsController->payment($request);
+            $paymentResult = $this->stripePaymentsController->payment($request,  $appointmentId);
     
             $paymentResultData = $paymentResult->getData();
     
@@ -67,6 +75,9 @@ class GestAppointmentController extends Controller
         );
         $appointmentResult = $this->appointmentSaver->saveAppointments($appointmentData);
 
+        $appointmentId = $appointmentResult->appointments[0]->id;
+        $this->stripePaymentsController->payment($request, $appointmentId);
+    
         return response()->json($appointmentResult->appointments);
     }
 
@@ -132,17 +143,12 @@ class GestAppointmentController extends Controller
     /**
      * 予約の削除
      *
-     * @param $appId
+     * @param integer $appId
      * @return void
-     */
-    public function deleteAppointment($appId)
+     */ 
+    public function deleteAppointment(int $appId)
     {
-        $appointment = Appointment::query()->findOrFail($appId);
-        if ($appointment) {
-            $appointment->delete();  
-            return response()->json(['message' => 'Deleted successfully']);
-        } else {
-            return response()->json(['message' => 'Record not found']);
-        }
+        $deleteAppointment = $this->deleteAppointment->deleteAppointment($appId);
+        return response()->json($deleteAppointment);
     }
 }

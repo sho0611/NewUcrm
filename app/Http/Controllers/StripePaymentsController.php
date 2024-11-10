@@ -7,12 +7,12 @@ use Stripe\Stripe;
 use Stripe\Customer;
 use Stripe\Charge;
 use Exception;
-use Illuminate\Support\Facades\Log; 
+use App\Models\StripePayment;   
 
 class StripePaymentsController extends Controller
 {
    
-    public function payment(Request $request)
+    public function payment(Request $request, $appointmentId)  
     {
         try {
             Stripe::setApiKey(env('STRIPE_SECRET'));
@@ -35,18 +35,30 @@ class StripePaymentsController extends Controller
                 'currency' => 'jpy'
             ]);
 
-            if (!$charge) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Could not charge.'
-                ]);
-            }
+            $payments = new StripePayment();
+            $createPayments = [
+                'appointment_id' => $appointmentId, 
+                'charge_id' => $charge->id,
+                'amount' => $request->amount,
+                'customer_id' => $customer->id
+            ]; 
+            
+            $payments->fill($createPayments);
+            $payments->save();
+
+            $payments->update([
+                'appointment_id' => $request->appointment_id, 
+            ]);
+            
+            
 
             return response()->json([
                 'status' => 'success',
+                'customer_id' => $customer->id, 
                 'message' => 'Payment processed successfully',
                 'charge_id' => $charge->id
             ]);
+
             
         } catch (Exception $e) {
             return response()->json([
