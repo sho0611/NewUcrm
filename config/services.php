@@ -31,6 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'stripe' => [
+        'api_key' => env('STRIPE_KEY'),
+        'api_secret' => env('STRIPE_SECRET'),
+    ],
+
     'paypay' => [
     'api_key' => env('PAYPAY_API_KEY'),
     'api_secret' => env('PAYPAY_API_SECRET'),

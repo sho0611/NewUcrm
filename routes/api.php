@@ -110,10 +110,12 @@ Route::prefix('analysis')->controller(AnalysisController::class)->group(function
     Route::get('/year', 'analysisYear')->name('analysisYear');
 });
 
-Route::post('/payment', [StripePaymentsController::class, 'payment'])->name('api.payment');
-Route::get('/payment/complete', [StripePaymentsController::class, 'complete'])->name('api.complete');
+Route::post('/payment', [StripePaymentsController::class, 'payment']);
 
-Route::prefix('paypay')->as('paypay.')->group(function () {
+
+
+
+Route::prefix('paypay')->as('paypay')->group(function () {
     Route::post('/payment', [PayPayController::class, 'payment'])->name('payment');
     Route::post('/webhook', [PayPayController::class, 'webhook']);
 });

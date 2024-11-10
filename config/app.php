@@ -212,4 +212,9 @@ return [
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
 
+    'stipe' => [
+    'api_key' => env('STRIPE_KEY'),
+    'api_secret' => env('STRIPE_SECRET'),]
+
+
 ];

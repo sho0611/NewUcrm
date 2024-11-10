@@ -47,7 +47,8 @@ class SaveAppointment implements AppointmentSaverInterface
                 'staff_id' => $appointmentData->staffId,
                 'appointment_date' => $appointmentData->appointmentDate,
                 'appointment_time' => $this->calculateAppointmentTime($appointmentData,
-                $appointments, $index)
+                $appointments, $index), 
+                'payment_method' => $appointmentData->paymentMethod,    
             ];
 
             $appointment->fill($createAppointments);

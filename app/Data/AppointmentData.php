@@ -9,6 +9,7 @@ class AppointmentData
     public int $staffId;
     public string $appointmentDate;
     public string $appointmentTime;
+    public string $paymentMethod;
     /**
      * AppointmentData クラスのコンストラクタ
      * 
@@ -17,13 +18,16 @@ class AppointmentData
      * @param int $staffId スタッフのID
      * @param string $appointmentDate 予約日（YYYY-MM-DD形式）
      * @param string $appointmentTime 予約時間（HH:MM形式）
+     * @param string $paymentMethod 支払い方法  
+     * 
      */
-    public function __construct(array $itemIds, int $customerId, int $staffId, string $appointmentDate, string $appointmentTime)
+    public function __construct(array $itemIds, int $customerId, int $staffId, string $appointmentDate , string $appointmentTime, string $paymentMethod)           
     {
         $this->itemIds = $itemIds;
         $this->customerId = $customerId;
         $this->staffId = $staffId;
         $this->appointmentDate = $appointmentDate;
-        $this->appointmentTime = $appointmentTime;
+        $this->appointmentTime = $appointmentTime; 
+        $this->paymentMethod = $paymentMethod;     
     }
 }

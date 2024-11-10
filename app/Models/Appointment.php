@@ -22,10 +22,10 @@ class Appointment extends Model
         'customer_id',
         'staff_id',
         'appointment_date',
-        'appointment_time' 
+        'appointment_time', 
+        'payment_method' 
     ];
     
-
     public function item()
     {
         return $this->belongsTo(Item::class, 'item_id', 'item_id'); 
