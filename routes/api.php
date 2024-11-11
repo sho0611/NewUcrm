@@ -25,6 +25,7 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\GestStaffController;   
 use App\Http\Controllers\StripePaymentsController;
 use App\Http\Controllers\PayPayController;  
+use App\Http\Controllers\ProcessPaymentController;  
 
 
 /*
@@ -110,10 +111,7 @@ Route::prefix('analysis')->controller(AnalysisController::class)->group(function
     Route::get('/year', 'analysisYear')->name('analysisYear');
 });
 
-Route::post('/payment', [StripePaymentsController::class, 'payment']);
-
-
-
+Route::post('/pay', [ProcessPaymentController::class, 'processPayment']);
 
 Route::prefix('paypay')->as('paypay')->group(function () {
     Route::post('/payment', [PayPayController::class, 'payment'])->name('payment');

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Services; 
 
 use Illuminate\Http\Request;
 use Stripe\Stripe;
@@ -9,7 +9,7 @@ use Stripe\Charge;
 use Exception;
 use App\Services\storePaymentDetails; 
 
-class StripePaymentsController extends Controller
+class StripePayments
 {
     protected $storePaymentDetails;
     
@@ -60,5 +60,6 @@ class StripePaymentsController extends Controller
         }
     }
 }
+
 
 

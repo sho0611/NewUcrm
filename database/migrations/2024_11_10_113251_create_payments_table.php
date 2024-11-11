@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('stripe_payments', function (Blueprint $table) {
             $table->id('stripe_payment_id');
             $table->foreignId('appointment_id')
+            ->nullable()    
             ->references('appointment_id')
             ->on('appointments')     
             ->onUpdate('cascade')

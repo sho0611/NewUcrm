@@ -13,11 +13,8 @@ use App\Interfaces\AppointmentSaverInterface;
 use Illuminate\Support\Facades\Log;
 use App\Services\CreateTimeArray;
 use App\Services\GetReservedTimeArray;
-use Stripe\Stripe;
-use Stripe\Refund;
-use App\Models\StripePayment;  
-use Exception;
 use App\Services\DeleteAppointment;
+use App\Services\storePaymentDetails;
 
 
 
@@ -29,14 +26,15 @@ class GestAppointmentController extends Controller
     protected $createTimeArray;
     protected $stripePaymentsController;
     protected $deleteAppointment;
+    protected $storePaymentDetails; 
     
-    public function __construct(AppointmentSaverInterface $appointmentSaver, GetReservedTimeArray $getReservedTimeArray,CreateTimeArray $createTimeArray, StripePaymentsController $stripePaymentsController, DeleteAppointment $deleteAppointment)    
+    public function __construct(AppointmentSaverInterface $appointmentSaver, GetReservedTimeArray $getReservedTimeArray,CreateTimeArray $createTimeArray, StripePaymentsController $stripePaymentsController, DeleteAppointment $deleteAppointment,)    
     {
         $this->appointmentSaver = $appointmentSaver; 
         $this->getReservedTimeArray = $getReservedTimeArray;
         $this->createTimeArray = $createTimeArray; 
         $this->stripePaymentsController = $stripePaymentsController;
-        $this->deleteAppointment = $deleteAppointment;
+        $this->deleteAppointment = $deleteAppointment; 
     }
      /**
      * 予約の作成
@@ -45,40 +43,23 @@ class GestAppointmentController extends Controller
      * @return \Illuminate\Http\JsonResponse 予約結果をJSONで返却
      */
     public function createAppointment(StoreAppointmentRequest $request)
-    {
-        $appointmentId = null;
-        if ($request->payment_method === 'online') {
+    {  
 
-            $paymentResult = $this->stripePaymentsController->payment($request,  $appointmentId);
-    
-            $paymentResultData = $paymentResult->getData();
-    
-            if ($paymentResultData->status === 'error') {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Reservation could not be completed due to payment failure',
-                ]);
-            } else {
-                $payment_method = 'paid';
-            }
-        } else {
-            $payment_method = 'unpaid';
-        }
-            
         $appointmentData = new AppointmentData(
             itemIds: $request->item_id,
             customerId: $request->customer_id,
             staffId: $request->staff_id,
             appointmentDate: $request->appointment_date,
             appointmentTime: $request->appointment_time,
-            paymentMethod: $payment_method, 
+            paymentMethod: $request->payment_method
         );
+
         $appointmentResult = $this->appointmentSaver->saveAppointments($appointmentData);
 
-        $appointmentId = $appointmentResult->appointments[0]->id;
-        $this->stripePaymentsController->payment($request, $appointmentId);
-    
-        return response()->json($appointmentResult->appointments);
+        return response()->json([
+            'status' => 'temporary_reservation',
+            'appointment' => $appointmentResult->appointments
+        ]);    
     }
 
     /**
