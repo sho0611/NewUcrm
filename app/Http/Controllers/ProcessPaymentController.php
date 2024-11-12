@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Appointment; 
-use Illuminate\Http\Request;    
-use App\Services\storePaymentDetails; 
+use Illuminate\Http\Request;
 use App\Services\StripePayments;
+use App\Services\StorePaymentDetails;
+use App\Models\Appointment;
 
 class ProcessPaymentController extends Controller
 {
     protected $storePaymentDetails;
-    protected $StripePayments;
+    protected $stripePayments;
     
-    public function __construct(StripePayments $StripePayments, storePaymentDetails $storePaymentDetails)       
+    public function __construct(StripePayments $stripePayments, StorePaymentDetails $storePaymentDetails)       
     {
         $this->storePaymentDetails = $storePaymentDetails;
-        $this->StripePayments = $StripePayments;    
+        $this->stripePayments = $stripePayments;    
     }
    
     /**
@@ -27,8 +27,7 @@ class ProcessPaymentController extends Controller
      */
     public function processPayment(Request $request)
     {
-        $paymentResult = $this->StripePayments->payment($request);
-    
+        $paymentResult = $this->stripePayments->payment($request);
         $paymentResultData = $paymentResult->getData();
     
         if ($paymentResultData->status === 'error') {
@@ -45,7 +44,7 @@ class ProcessPaymentController extends Controller
         $appointment->payment_method = 'paid'; 
         $appointment->save();
         
-        $this->storePaymentDetails->upDatePaymentsTable($appointmentId);
+        $this->storePaymentDetails->upDatePaymentstable($appointmentId);
     
         return response()->json([
             'status' => 'success',
@@ -53,5 +52,4 @@ class ProcessPaymentController extends Controller
             'appointment' => $appointment
         ]);
     }
-    
 }
