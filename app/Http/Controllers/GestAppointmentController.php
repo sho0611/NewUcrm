@@ -44,7 +44,6 @@ class GestAppointmentController extends Controller
      */
     public function createAppointment(StoreAppointmentRequest $request)
     {  
-
         $appointmentData = new AppointmentData(
             itemIds: $request->item_id,
             customerId: $request->customer_id,
@@ -91,30 +90,13 @@ class GestAppointmentController extends Controller
      */
     public function changAppointment(int $appId, UpdateAppointmentRequest $request)
     {
-        if($request->payment_method === 'online')
-        {
-            $paymentResult = $this->stripePaymentsController->payment($request);   
-        }
-            if ($paymentResult->getData()->status === 'error') {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Reservation could not be completed due to payment failure',
-                ]);
-            } else {
-                $payment_method = 'paid';
-            }
-
-            if ($request->payment_method === 'onsite') {
-                $payment_method = 'unpaid'; 
-            }
-
         $appointmentData = new AppointmentData(
             itemIds: $request->item_id,
             customerId: $request->customer_id,
             staffId: $request->staff_id,
             appointmentDate: $request->appointment_date,
             appointmentTime: $request->appointment_time,
-            paymentMethod: $payment_method, 
+            paymentMethod: $request->payment_method, 
         );
         $appointmentResult = $this->appointmentSaver->saveAppointments($appointmentData, $appId);
 

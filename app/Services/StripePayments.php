@@ -7,7 +7,7 @@ use Stripe\Stripe;
 use Stripe\Customer;
 use Stripe\Charge;
 use Exception;
-use App\Services\storePaymentDetails; 
+use App\Services\StorePaymentDetails; 
 
 class StripePayments
 {
@@ -22,7 +22,6 @@ class StripePayments
     {
         try {
             Stripe::setApiKey(env('STRIPE_SECRET'));
-
             $customer = Customer::create([
                 'email' => $request->stripeEmail,                
                 'source' => $request->stripeToken
