@@ -7,7 +7,7 @@ use Stripe\Stripe;
 use Stripe\Customer;
 use Stripe\Charge;
 use Exception;
-use App\Services\storePaymentDetails; 
+use App\Services\StorePaymentDetails; 
 
 class StripePayments
 {
