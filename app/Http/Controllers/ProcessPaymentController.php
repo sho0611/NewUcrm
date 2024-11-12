@@ -45,7 +45,7 @@ class ProcessPaymentController extends Controller
         $appointment->payment_method = 'paid'; 
         $appointment->save();
         
-        $this->storePaymentDetails->upDatePaymentstable($appointmentId);
+        $this->storePaymentDetails->upDatePaymentsTable($appointmentId);
     
         return response()->json([
             'status' => 'success',

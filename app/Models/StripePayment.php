@@ -12,7 +12,6 @@ class StripePayment extends Model
     protected $table = 'stripe_payments';    
     protected $primaryKey = 'stripe_payment_id';    
 
-
     protected $fillable = [
         'appointment_id',
         'charge_id',

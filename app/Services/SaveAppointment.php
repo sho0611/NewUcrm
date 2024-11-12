@@ -40,7 +40,7 @@ class SaveAppointment implements AppointmentSaverInterface
             } else {
                 $appointment = new Appointment(); 
             }
-    
+
             $createAppointments = [
                 'item_id' => $itemId,
                 'customer_id' => $appointmentData->customerId,
@@ -48,9 +48,9 @@ class SaveAppointment implements AppointmentSaverInterface
                 'appointment_date' => $appointmentData->appointmentDate,
                 'appointment_time' => $this->calculateAppointmentTime($appointmentData,
                 $appointments, $index), 
-                'payment_method' => $appointmentData->paymentMethod,    
+                'payment_method' => $appointmentData->paymentMethod,
+                'status' => $appointmentData->status        
             ];
-
             $appointment->fill($createAppointments);
             $appointment->save();
             $appointments[] = $appointment;

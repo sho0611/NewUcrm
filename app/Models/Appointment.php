@@ -23,7 +23,8 @@ class Appointment extends Model
         'staff_id',
         'appointment_date',
         'appointment_time', 
-        'payment_method' 
+        'payment_method',
+        'status'
     ];
     
     public function item()

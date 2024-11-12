@@ -8,6 +8,8 @@ use Stripe\Customer;
 use Stripe\Charge;
 use Exception;
 use App\Services\storePaymentDetails; 
+use App\Models\Item;
+use SebastianBergmann\CodeCoverage\Report\Xml\Totals;
 
 class StripePayments
 {
@@ -23,6 +25,19 @@ class StripePayments
         try {
             Stripe::setApiKey(env('STRIPE_SECRET'));
 
+            $totalAmount = 0;
+            foreach ($request->item_id as $itemId) {
+                    $item = Item::findOrFail($itemId); 
+                    $totalAmount += $item->price;
+            }
+
+            if(!$totalAmount) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No items in cart'
+                ]);
+            }   
+            
             $customer = Customer::create([
                 'email' => $request->stripeEmail,                
                 'source' => $request->stripeToken
@@ -37,7 +52,7 @@ class StripePayments
 
             $charge = Charge::create([
                 'customer' => $customer->id, 
-                'amount' => $request->amount,
+                'amount' => $totalAmount,  
                 'currency' => 'jpy'
             ]);
 
@@ -46,11 +61,10 @@ class StripePayments
             return response()->json([
                 'status' => 'success',
                 'customer_id' => $customer->id, 
-                'message' => 'Payment processed successfully',
+                'paid' => $totalAmount,   
                 'charge_id' => $charge->id
             ]);
 
-            
         } catch (Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -60,6 +74,4 @@ class StripePayments
         }
     }
 }
-
-
 

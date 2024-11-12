@@ -38,49 +38,33 @@ class GestAppointmentController extends Controller
     }
      /**
      * 予約の作成
+     * 仮予約とし支払い完了後に確定予約に変更
      *
      * @param StoreAppointmentRequest $request
      * @return \Illuminate\Http\JsonResponse 予約結果をJSONで返却
      */
     public function createAppointment(StoreAppointmentRequest $request)
     {  
-
         $appointmentData = new AppointmentData(
             itemIds: $request->item_id,
             customerId: $request->customer_id,
             staffId: $request->staff_id,
             appointmentDate: $request->appointment_date,
             appointmentTime: $request->appointment_time,
-            paymentMethod: $request->payment_method
+            paymentMethod: $request->payment_method,
+            status: 'temporary_reservation'
         );
+
+        if ($appointmentData->paymentMethod === 'onsite') {
+            $appointmentData->status = 'reserved';
+        }
 
         $appointmentResult = $this->appointmentSaver->saveAppointments($appointmentData);
 
         return response()->json([
-            'status' => 'temporary_reservation',
             'appointment' => $appointmentResult->appointments
         ]);    
     }
-
-    /**
-     * 予約可能な時間を表示
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function getAvailableTimes(Request $request)
-    {
-    
-    $appointDate = $request->query('date');
-    $times = $this->createTimeArray->createTimeArray();
-    $reservedTimes = $this->getReservedTimeArray->getReservedTime($appointDate);
-
-    $availableTimes = array_diff($times, $reservedTimes);
-    
-        return response()->json([
-            'availableTimes' => array_values($availableTimes),
-        ]); 
-    }
-
 
     /**
      * 予約の変更
@@ -91,30 +75,14 @@ class GestAppointmentController extends Controller
      */
     public function changAppointment(int $appId, UpdateAppointmentRequest $request)
     {
-        if($request->payment_method === 'online')
-        {
-            $paymentResult = $this->stripePaymentsController->payment($request);   
-        }
-            if ($paymentResult->getData()->status === 'error') {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Reservation could not be completed due to payment failure',
-                ]);
-            } else {
-                $payment_method = 'paid';
-            }
-
-            if ($request->payment_method === 'onsite') {
-                $payment_method = 'unpaid'; 
-            }
-
         $appointmentData = new AppointmentData(
             itemIds: $request->item_id,
             customerId: $request->customer_id,
             staffId: $request->staff_id,
             appointmentDate: $request->appointment_date,
             appointmentTime: $request->appointment_time,
-            paymentMethod: $payment_method, 
+            paymentMethod: $request->payment_method,
+            status: 'temporary_reservation'
         );
         $appointmentResult = $this->appointmentSaver->saveAppointments($appointmentData, $appId);
 
@@ -131,5 +99,24 @@ class GestAppointmentController extends Controller
     {
         $deleteAppointment = $this->deleteAppointment->deleteAppointment($appId);
         return response()->json($deleteAppointment);
+    }
+
+        /**
+     * 予約可能な時間を表示
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getAvailableTimes(Request $request)
+    {
+    
+    $appointDate = $request->query('date');
+    $times = $this->createTimeArray->createTimeArray();
+    $reservedTimes = $this->getReservedTimeArray->getReservedTime($appointDate);
+
+    $availableTimes = array_diff($times, $reservedTimes);
+    
+        return response()->json([
+            'availableTimes' => array_values($availableTimes),
+        ]); 
     }
 }

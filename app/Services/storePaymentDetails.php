@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\StripePayment;   
 
-class storePaymentDetails
+class StorePaymentDetails
 {
     public function createPaymentsTable($charge, $customer)
     {
@@ -22,7 +22,7 @@ class storePaymentDetails
         return response()->json($payments);
     }
 
-    public function upDatePaymentstable($appointmentId)
+    public function upDatePaymentsTable($appointmentId)
     {
         $payment = StripePayment::where('appointment_id', null)->first(); 
 
