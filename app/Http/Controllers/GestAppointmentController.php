@@ -44,7 +44,6 @@ class GestAppointmentController extends Controller
      */
     public function createAppointment(StoreAppointmentRequest $request)
     {  
-
         $appointmentData = new AppointmentData(
             itemIds: $request->item_id,
             customerId: $request->customer_id,

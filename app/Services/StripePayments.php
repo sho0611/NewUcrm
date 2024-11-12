@@ -22,7 +22,6 @@ class StripePayments
     {
         try {
             Stripe::setApiKey(env('STRIPE_SECRET'));
-
             $customer = Customer::create([
                 'email' => $request->stripeEmail,                
                 'source' => $request->stripeToken
