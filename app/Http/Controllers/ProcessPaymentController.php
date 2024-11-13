@@ -6,18 +6,21 @@ use Illuminate\Http\Request;
 use App\Services\StripePayments;
 use App\Services\StorePaymentDetails;
 use App\Models\Appointment;
+use App\Services\SendNotificationItemNames; 
 
 class ProcessPaymentController extends Controller
 {
     protected $storePaymentDetails;
     protected $stripePayments;
+    protected $sendNotificationItemNames;   
     
-    public function __construct(StripePayments $stripePayments, StorePaymentDetails $storePaymentDetails)       
+    public function __construct(StripePayments $stripePayments, StorePaymentDetails $storePaymentDetails, SendNotificationItemNames $sendNotificationItemNames)         
     {
         $this->storePaymentDetails = $storePaymentDetails;
-        $this->stripePayments = $stripePayments;    
+        $this->stripePayments = $stripePayments;  
+        $this->sendNotificationItemNames = $sendNotificationItemNames;   
     }
-   
+
     /**
      * 予約の支払い処理
      * 支払い完了後に予約ステータスを変更
@@ -37,15 +40,22 @@ class ProcessPaymentController extends Controller
             ]);
         }
     
-        $appointmentId = $request->appointment_id;
-        $appointment = Appointment::find($appointmentId);
-    
-        $appointment->status = 'reserved';
-        $appointment->payment_method = 'paid'; 
-        $appointment->save();
+        $appointmentIds = $request->appointment_id; 
+        foreach ($appointmentIds as $appointmentId) {
+            $appointment = Appointment::find($appointmentId);
         
-        $this->storePaymentDetails->upDatePaymentstable($appointmentId);
-    
+            if (!$appointment) {
+                continue;
+            }
+        
+            $appointment->status = 'reserved';
+            $appointment->payment_method = 'paid'; 
+            $appointment->save();
+        
+            $this->storePaymentDetails->upDatePaymentstable($appointmentId);
+            $this->sendNotificationItemNames->sendNotificationItemNames($appointment); 
+        }
+
         return response()->json([
             'status' => 'success',
             'message' => 'Reservation confirmed and paid',

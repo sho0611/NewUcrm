@@ -5,45 +5,27 @@ use App\Models\Item;
 use App\Models\Customer;
 use App\Notifications\AppointmentCreated;
 use App\Interfaces\SendNotificationItemNamesInterface;
-use App\Notifications\changeSendNotification;
 
 class SendNotificationItemNames implements SendNotificationItemNamesInterface
 {
     /**
-     * 予約作成時にアイテム名を含む予約内容を送信
+     * 予約時にアイテム名を通知
      *
-    * @param array $appointments 予約の配列
-    * @param int $customerId 顧客のID
-    * @param array $itemIds アイテムのIDの配列
-    * @param string $firstAppointmentTime 最初の予約時間
-     * @return void
+     * @param $appointment
      */
-    public function sendNotificationItemNames(array $appointments, int $customerId, array $itemIds, string $firstAppointmentTime)
+    public function sendNotificationItemNames($appointment)
     {
-       $itemNames = $this->getItemNamesByIds ($itemIds);
-       $customer = $this->getCustomerId($customerId);
-        if ($customer) {
-            $customer->notify(new AppointmentCreated(end($appointments), $itemNames, $firstAppointmentTime));
-        }
-    }
+    
+        $itemId = is_array($appointment->item_id) ? $appointment->item_id : [$appointment->item_id];
+            $customerId = $appointment->customer_id; 
+            $appointmentTime = $appointment->appointment_time; 
+            $appointmentDate = $appointment->appointment_date;
 
-    /**
-     * 予約変更時にアイテム名を含む予約内容を送信
-     *
-     * @param array $appointments
-     * @param integer $customerId
-     * @param array $itemIds
-     * @param string $firstAppointmentTime
-     * @return void
-     */
-    public function changeSendNotification(array $appointments, int $customerId, array $itemIds, string $firstAppointmentTime)
-    {
-       
-        $itemNames = $this->getItemNamesByIds ($itemIds);
-        $customer = $this->getCustomerId($customerId);
-        if ($customer) {
-            $customer->notify(new changeSendNotification(end($appointments), $itemNames, $firstAppointmentTime));
-        }
+            $itemNames = $this->getItemNamesByIds ($itemId);
+            $customer = $this->getCustomerDetailByids($customerId);
+                if ($customer) {
+                    $customer->notify(new AppointmentCreated(end($appointment), $itemNames, $appointmentDate, $appointmentTime)); 
+                }
     }
 
     /**
@@ -52,9 +34,9 @@ class SendNotificationItemNames implements SendNotificationItemNamesInterface
      * @param $itemIds
      * @return $itemNames アイテム名をカンマ区切りで連結した文字列
      */
-    private function getItemNamesByIds($itemIds)
+    private function getItemNamesByIds($itemId)
     {
-        $items = Item::whereIn('item_id', $itemIds)->get();
+        $items = Item::whereIn('item_id', $itemId)->first();
         $itemNames = $items->pluck('name')->implode(', ');
         return $itemNames;
     }
@@ -65,7 +47,7 @@ class SendNotificationItemNames implements SendNotificationItemNamesInterface
      * @param $customerId
      *  @return Customer|null 顧客オブジェクトまたは null
      */
-    private function getCustomerId(int $customerId): ?Customer
+    private function getCustomerDetailByids(int $customerId): ?Customer
     {
         $customer = Customer::where('customer_id', $customerId)->first();
         return $customer;

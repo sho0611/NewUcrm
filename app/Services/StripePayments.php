@@ -9,7 +9,6 @@ use Stripe\Charge;
 use Exception;
 use App\Services\storePaymentDetails; 
 use App\Models\Item;
-use SebastianBergmann\CodeCoverage\Report\Xml\Totals;
 
 class StripePayments
 {
@@ -19,7 +18,7 @@ class StripePayments
     {
         $this->storePaymentDetails = $storePaymentDetails;
     }
-   
+    
     public function payment(Request $request)  
     {
         try {

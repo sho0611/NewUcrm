@@ -13,13 +13,12 @@ class GestItemController extends Controller
     *
     * @return \Illuminate\Http\Response
     */
-   public function viewItems(Request $request)
-   {
-        $items = Item::query()
-        ->select('*')
-        ->get();
+     public function viewItems(Request $request)
+     {
+          $items = Item::query()
+          ->select('*')
+          ->get();
 
-        return response()->json($items);
-   }
-
+          return response()->json($items);
+     }
 }

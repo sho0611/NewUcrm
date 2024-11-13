@@ -10,14 +10,8 @@ use App\Interfaces\AppointmentSaverInterface;
 
 class SaveAppointment implements AppointmentSaverInterface
 {
-    protected $sendNotificationItemNames;
     private $firstAppointmentTime;
 
-    public function __construct(SendNotificationItemNames $sendNotificationItemNames)
-    {
-       
-        $this->sendNotificationItemNames = $sendNotificationItemNames;
-    }
     /**
      * 予約を保存する 
      * idがあれば更新、なければ新規作成
@@ -55,13 +49,6 @@ class SaveAppointment implements AppointmentSaverInterface
             $appointment->save();
             $appointments[] = $appointment;
         }
-
-        if ($appId) {
-            $this->sendNotificationItemNames->changeSendNotification($appointments, $appointmentData->customerId, $appointmentData->itemIds,  $this->firstAppointmentTime);
-        } else {
-            $this->sendNotificationItemNames->sendNotificationItemNames($appointments, $appointmentData->customerId, $appointmentData->itemIds,  $this->firstAppointmentTime);
-        }
-
         return new AppointmentResult($appointments);
     }
     /**

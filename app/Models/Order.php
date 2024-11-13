@@ -11,28 +11,6 @@ class Order extends Model
 {
     use HasFactory;
 
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'price',
-        'is_payment',
-        'paypay_merchant_payment_id',
-    ];
-
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'is_payment' => 'boolean',
-    ];
-
     
     protected static function booted()
     {
@@ -42,19 +20,14 @@ class Order extends Model
     public function scopeBetweenDate($query, $startDate = null, $endDate = null)
 {
 
-//開始日が指定されていない/終了日が指定されている//
 if(is_null($startDate) && !is_null($endDate))
 {
-    //created_atカラムがしてされた終了日以前のレコード
     $endDate1 = Carbon::parse($endDate)->addDays(1);
     return $query->where('created_at', '<=', $endDate1);
 }
 
-
-//両方指定されている場合//
 if(!is_null($startDate) && !is_null($endDate))
 {
-    //created_atが指定された開始日から終了日までのレコードを取得
     $endDate1 = Carbon::parse($endDate)->addDays(1);
     return $query->where('created_at', ">=", $startDate)
     ->where('created_at', '<=', $endDate1);

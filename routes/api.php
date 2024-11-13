@@ -111,14 +111,8 @@ Route::prefix('analysis')->controller(AnalysisController::class)->group(function
     Route::get('/year', 'analysisYear')->name('analysisYear');
 });
 
+//支払い
 Route::post('/pay', [ProcessPaymentController::class, 'processPayment']);
-
-Route::prefix('paypay')->as('paypay')->group(function () {
-    Route::post('/payment', [PayPayController::class, 'payment'])->name('payment');
-    Route::post('/webhook', [PayPayController::class, 'webhook']);
-});
-
-
 
 //データ分析 デシル
 Route::get('desile', [AnalysisDesileController::class, 'desile']);

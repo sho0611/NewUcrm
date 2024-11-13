@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('orders', function (Blueprint $table) {
-            $table->id('oder_id');
+        Schema::create('paypay_payments', function (Blueprint $table) {
+            $table->id('paypay_payments_id');
             $table->integer('price')->comment('料金');
             $table->boolean('is_payment')->default(false)->comment('決済判定');
             $table->string('paypay_merchant_payment_id')->nullable()->comment('PayPay 決済ID');

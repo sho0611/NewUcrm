@@ -4,17 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
-use App\Models\Appointment;
-use App\Models\Item;
 use Illuminate\Http\Request;
-use App\Models\Staff;
 use App\Data\AppointmentData;
 use App\Interfaces\AppointmentSaverInterface;
-use Illuminate\Support\Facades\Log;
 use App\Services\CreateTimeArray;
 use App\Services\GetReservedTimeArray;
 use App\Services\DeleteAppointment;
-use App\Services\storePaymentDetails;
+use App\Services\StorePaymentDetails;
 
 
 
@@ -26,17 +22,16 @@ class GestAppointmentController extends Controller
     protected $createTimeArray;
     protected $stripePaymentsController;
     protected $deleteAppointment;
-    protected $storePaymentDetails; 
     
-    public function __construct(AppointmentSaverInterface $appointmentSaver, GetReservedTimeArray $getReservedTimeArray,CreateTimeArray $createTimeArray, StripePaymentsController $stripePaymentsController, DeleteAppointment $deleteAppointment,)    
+    public function __construct(AppointmentSaverInterface $appointmentSaver, GetReservedTimeArray $getReservedTimeArray,CreateTimeArray $createTimeArray, StripePaymentsController $stripePaymentsController, DeleteAppointment $deleteAppointment)       
     {
         $this->appointmentSaver = $appointmentSaver; 
         $this->getReservedTimeArray = $getReservedTimeArray;
         $this->createTimeArray = $createTimeArray; 
         $this->stripePaymentsController = $stripePaymentsController;
-        $this->deleteAppointment = $deleteAppointment; 
+        $this->deleteAppointment = $deleteAppointment;   
     }
-     /**
+    /**
      * 予約の作成
      * 仮予約とし支払い完了後に確定予約に変更
      *
